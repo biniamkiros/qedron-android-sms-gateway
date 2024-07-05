@@ -1,0 +1,106 @@
+{
+  "project_info": {
+    "project_number": "147374240999",
+    "firebase_url": "https://tether-c3a06.firebaseio.com",
+    "project_id": "tether-c3a06",
+    "storage_bucket": "tether-c3a06.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:147374240999:android:c08c0bac0d8c9b5e065e42",
+        "android_client_info": {
+          "package_name": "com.biniamkiros.notifier"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "147374240999-090u6i03900gq9lul12hv8k5em4bnuqk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMpM08C4qDlYAZ-4zZ3OfquTfInsIKBM8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "147374240999-090u6i03900gq9lul12hv8k5em4bnuqk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:147374240999:android:debd1ec7afa94bef065e42",
+        "android_client_info": {
+          "package_name": "com.biniamkiros.tether"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "147374240999-hl96b6ua57gq3hp7h64p67js1p2njv40.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.biniamkiros.tether",
+            "certificate_hash": "7e7485202f1a39fc45cb5ae99196ae6bf41895fc"
+          }
+        },
+        {
+          "client_id": "147374240999-090u6i03900gq9lul12hv8k5em4bnuqk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMpM08C4qDlYAZ-4zZ3OfquTfInsIKBM8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "147374240999-090u6i03900gq9lul12hv8k5em4bnuqk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:147374240999:android:7c66c95475e3de5e065e42",
+        "android_client_info": {
+          "package_name": "com.qedron.gateway"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "147374240999-090u6i03900gq9lul12hv8k5em4bnuqk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMpM08C4qDlYAZ-4zZ3OfquTfInsIKBM8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "147374240999-090u6i03900gq9lul12hv8k5em4bnuqk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

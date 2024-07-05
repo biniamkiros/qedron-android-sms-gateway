@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/gateway_coordinator"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_dark">
+
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/gateway_nested_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <!--        android:layout_marginTop="?attr/actionBarSize"-->
+        <LinearLayout
+            android:id="@+id/gateway_holder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp"
+            >
+
+            <TextView
+                android:id="@+id/gateway_cloud_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="CLOUD SERVICE"
+                android:textColor="@color/purple_500"
+                android:padding="12dp"/>
+
+            <RelativeLayout
+                android:id="@+id/gateway_cloud_key_holder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="12dp"
+                android:background="?android:selectableItemBackground">
+
+                <TextView
+                    android:id="@+id/gateway_cloud_key_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="Token" />
+
+                <TextView
+                    android:id="@+id/gateway_cloud_key"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/gateway_cloud_key_label" />
+
+            </RelativeLayout>
+
+<!--            <include-->
+<!--                android:id="@+id/gateway_cloud_divider"-->
+<!--                layout="@layout/divider" />-->
+            <View android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:alpha="0.5"
+                android:background="#121212"
+                android:layout_margin="12dp"/>
+
+            <TextView
+                android:id="@+id/gateway_local_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="LOCAL SERVICE"
+                android:textColor="@color/purple_500"
+                android:padding="12dp"/>
+
+            <RelativeLayout
+                android:id="@+id/gateway_local_enable_holder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="12dp">
+
+                <CheckBox
+                    android:id="@+id/gateway_local_enable"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Enable service"
+                    android:clickable="false"
+                    android:gravity="left|center"
+                    android:layoutDirection="rtl"
+                    />
+<!--                //or "center_vertical" for center text-->
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/gateway_local_key_holder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/gateway_local_key_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="Token" />
+
+                <TextView
+                    android:id="@+id/gateway_local_key"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/gateway_local_key_label" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/gateway_local_endpoints_holder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/gateway_local_endpoints_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="Endpoints" />
+
+                <TextView
+                    android:id="@+id/gateway_local_endpoints"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/gateway_local_endpoints_label" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</RelativeLayout>
