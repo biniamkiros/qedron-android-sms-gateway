@@ -16,9 +16,6 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.ArrayList
 import java.util.Calendar
 import java.util.Locale
@@ -37,7 +34,7 @@ class GatewayMessagingService : FirebaseMessagingService() {
         val message = remoteMessage.data["message"]
         if (phone != null && message != null) {
             try {
-                val sms = SmsManager.getDefault()
+                val sms = this.getSystemService(SmsManager::class.java)//SmsManager.getDefault()
                 val parts: ArrayList<String> = sms.divideMessage(message)
                 sms.sendMultipartTextMessage(
                     phone,
@@ -78,6 +75,8 @@ class GatewayMessagingService : FirebaseMessagingService() {
            notificationManager.createNotificationChannel(channel)
         }
 
+        val timeoutMs = 1000L * 60 * 60 * 6
+
         val intent = Intent(this, MainActivity::class.java)
         val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_IMMUTABLE else 0
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, flags)
@@ -89,6 +88,7 @@ class GatewayMessagingService : FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .setContentTitle(title)
             .setContentText(text)
+            .setTimeoutAfter(timeoutMs)
             .setShowWhen(true)
             .setContentIntent(pendingIntent)
         notificationManager.notify(NOTIFICATION_ID, builder.build())

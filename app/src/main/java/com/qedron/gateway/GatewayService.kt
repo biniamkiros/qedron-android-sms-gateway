@@ -78,7 +78,7 @@ class GatewayService : Service(), GatewayServer.Handler {
 
     override fun onSendMessage(phone: String, message: String, saveMessage: Boolean): String? {
         return try {
-            val sms = SmsManager.getDefault()
+            val sms = this.getSystemService(SmsManager::class.java)
             val parts: ArrayList<String> = sms.divideMessage(message)
             sms.sendMultipartTextMessage(
                 phone,
