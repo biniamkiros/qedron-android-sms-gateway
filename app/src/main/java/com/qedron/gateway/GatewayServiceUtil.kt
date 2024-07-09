@@ -54,8 +54,8 @@ object GatewayServiceUtil {
         val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_IMMUTABLE else 0
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, flags)
 
-        val title = "Today's messages: ${stat.count}${if(stat.count > 0) ", sent: ${stat.sent}, delivered: ${stat.delivered}" else ""} ${if(stat.failed > 0) ", failed:${stat.failed}" else ""}"
-        val detail = "Last event: "+stat.last + "\n\nLast message: " + stat.message
+        val title = "Today's messages: ${if(stat.last.isNullOrEmpty()) "no messages" else stat.count}${if(stat.count > 0) ", sent: ${stat.sent}, delivered: ${stat.delivered}" else ""} ${if(stat.failed > 0) ", failed:${stat.failed}" else ""}"
+        val detail = "Last event: ${if(stat.last.isNullOrEmpty()) "no event" else stat.last} \n\nLast message: ${if(stat.message.isNullOrEmpty()) "no message" else stat.message}"
         val builder = NotificationCompat.Builder(context, STATUS_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notif)
             .setPriority(NotificationCompat.PRIORITY_MIN)
