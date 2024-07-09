@@ -1,19 +1,12 @@
 package com.qedron.gateway
 
-//import com.simplemobiletools.commons.extensions.*
-//import com.simplemobiletools.commons.helpers.*
-//import com.simplemobiletools.smsmessenger.activities.SimpleActivity
-//import com.simplemobiletools.smsmessenger.databinding.ActivityGatewayBinding
-
 import android.Manifest.permission.SEND_SMS
-import android.R.id.message
 import android.content.ClipboardManager
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.telephony.SmsManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,7 +22,6 @@ import com.qedron.gateway.ui.theme.GatewayTheme
 import java.net.Inet4Address
 import java.net.NetworkInterface
 import java.util.*
-
 
 class MainActivity : ComponentActivity() {
 
@@ -56,14 +48,14 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    private fun checkSMSPermission() {
+    private fun checkSMSPermission():Boolean {
         if (ContextCompat.checkSelfPermission(
                 this,
                 SEND_SMS
             )
             != PackageManager.PERMISSION_GRANTED
         ) {
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(
+            return if (!ActivityCompat.shouldShowRequestPermissionRationale(
                     this,
                     SEND_SMS
                 )
@@ -72,25 +64,13 @@ class MainActivity : ComponentActivity() {
                     this, arrayOf<String>(SEND_SMS),
                     Companion.PERMISSION_REQUEST_SEND_SMS
                 )
+                false
+            } else {
+                Toast.makeText(this, "sms permission is required. Grant permission from app settings", Toast.LENGTH_LONG).show()
+                false
             }
-        }
-        else {
-
-//            val message = "#ጨረታ Purchasing of Plastic Floor (Stone Plastic Composite (SPC) Work with Material/2016\n" +
-//                    "\uD83D\uDCB5 ፕሮፎርማ    Mon Jun 17th, 24 - Mon Jun 17th, 24\n" +
-//                    "\n" +
-//                    " \uD83D\uDC49 t.me/SeledaGramBot/start?id=gghnለእርስዎ የሚሆኑ ጨረታዎችን ለመፈለግ ጊዜ አጥሮዎታል?\n" +
-//                    "በዚህ ጊዜ ቆጣቢ በሆነ መንገድ ይጠቀሙ። የሚያስፈልግዎን ጨረታዎችን ብቻ መርጦ ይላክልዎታል።\n" +
-//                    "ተጨማሪ \uD83D\uDC49 t.me/SeledaGramBot"
-//            val sms = SmsManager.getDefault()
-//            val parts: ArrayList<String> = sms.divideMessage(message)
-//            sms.sendMultipartTextMessage(
-//                "+251913201724",
-//                null,
-//                parts,
-//                null,
-//                null
-//                )
+        } else {
+            return true
         }
 
     }
@@ -103,30 +83,24 @@ class MainActivity : ComponentActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            Companion.PERMISSION_REQUEST_SEND_SMS -> {
-                if (grantResults.size > 0
+            PERMISSION_REQUEST_SEND_SMS -> {
+                if (grantResults.isNotEmpty()
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 ) {
-                    Toast.makeText(
-                        applicationContext, "SMS permission granted successfully.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    initFirebase()
                 } else {
                     Toast.makeText(
                         applicationContext,
-                        "SMS permission grant failed", Toast.LENGTH_LONG
+                        "SMS permission grant failed. Grant from app settings.", Toast.LENGTH_LONG
                     ).show()
+                    finish()
                     return
                 }
             }
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-//        setupToolbar(binding.gatewayToolbar, NavigationIcon.Arrow)
-        checkSMSPermission()
-
+    private fun initFirebase(){
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 binding.gatewayCloudKey.text = task.result
@@ -145,8 +119,8 @@ class MainActivity : ComponentActivity() {
             } else {
                 ContextCompat.startForegroundService(this, intent)
                 Toast.makeText(
-                        applicationContext, "Starting local service...",
-                Toast.LENGTH_LONG
+                    applicationContext, "Starting local service...",
+                    Toast.LENGTH_LONG
                 ).show()
             }
             binding.gatewayLocalEnable.isChecked = !running
@@ -168,11 +142,14 @@ class MainActivity : ComponentActivity() {
         }
 
         GatewayServiceUtil.notifyStat(this)
-//        updateTextColors(binding.gatewayNestedScrollview)
-    }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    }
+    override fun onResume() {
+        super.onResume()
+
+        if(checkSMSPermission()) initFirebase()
+
+
     }
 
     private fun getKey(): String {
@@ -195,12 +172,6 @@ class MainActivity : ComponentActivity() {
         }
         return result
     }
-
-//    override fun getAppIconIDs() = arrayListOf(
-//        R.mipmap.ic_launcher,
-//    )
-
-//    override fun getAppLauncherName() = getString(R.string.app_launcher_name)
 
     override fun getPackageName(): String {
         val trace = Thread.currentThread().stackTrace

@@ -1,27 +1,14 @@
 package com.qedron.gateway
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.os.Build
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.telephony.SmsManager
-import android.util.Log
 import android.widget.Toast
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.qedron.gateway.GatewayServiceUtil.COUNT
-import com.qedron.gateway.GatewayServiceUtil.DELIVERED
-import com.qedron.gateway.GatewayServiceUtil.FAILED
-import com.qedron.gateway.GatewayServiceUtil.SENT
-import com.qedron.gateway.GatewayServiceUtil.SMS_NUMBER
-
 
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
 class GatewayMessagingService : FirebaseMessagingService() {

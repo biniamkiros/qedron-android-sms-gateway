@@ -28,7 +28,6 @@ class GatewayService : Service(), GatewayServer.Handler {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 GATEWAY_CHANNEL_ID,
-//                context.getString(R.string.gateway_channel),
                 "qedron gateway channel",
                 NotificationManager.IMPORTANCE_MIN
             )
@@ -89,7 +88,6 @@ class GatewayService : Service(), GatewayServer.Handler {
             )
 
             Toast.makeText(this, "Sending sms..", Toast.LENGTH_LONG).show()
-//            SmsManager.getDefault().sendTextMessage(phone, null, message, null, null)
             null
         } catch (e: Exception) {
             Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
