@@ -167,6 +167,7 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this, R.string.gateway_copied_toast, Toast.LENGTH_SHORT).show()
         }
 
+        GatewayServiceUtil.notifyStat(this)
 //        updateTextColors(binding.gatewayNestedScrollview)
     }
 
