@@ -60,7 +60,6 @@ object GatewayServiceUtil {
             .setSmallIcon(R.drawable.ic_notif)
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .setContentTitle(title)
-//            .setContentText(detail)
             .setTimeoutAfter(timeoutMs)
             .setShowWhen(true)
             .setStyle(NotificationCompat.BigTextStyle().bigText(detail))
