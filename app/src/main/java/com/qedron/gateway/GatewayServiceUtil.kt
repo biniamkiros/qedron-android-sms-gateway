@@ -15,7 +15,6 @@ import java.util.Locale
 
 @Suppress("DEPRECATION")
 object GatewayServiceUtil {
-    const val SMS_NUMBER = "sms_number"
     private const val NOTIFICATION_ID = 7545600
     const val STATUS_CHANNEL_ID = "qedron_status_notifications_gateway"
     const val STATUS_CHANNEL_NAME = "qedron status channel"
