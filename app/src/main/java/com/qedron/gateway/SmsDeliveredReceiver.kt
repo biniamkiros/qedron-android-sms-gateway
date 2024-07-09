@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.qedron.gateway.GatewayServiceUtil.SMS_NUMBER
 
 class SmsDeliveredReceiver : BroadcastReceiver() {
     val TAG = "TRACK_SMS_STATUS"

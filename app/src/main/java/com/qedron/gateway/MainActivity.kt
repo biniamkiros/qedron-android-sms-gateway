@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 ActivityCompat.requestPermissions(
                     this, arrayOf<String>(SEND_SMS),
-                    Companion.PERMISSION_REQUEST_SEND_SMS
+                    PERMISSION_REQUEST_SEND_SMS
                 )
                 false
             } else {

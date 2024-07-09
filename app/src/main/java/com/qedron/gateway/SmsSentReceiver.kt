@@ -4,16 +4,13 @@ import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.telephony.SmsManager
 import android.util.Log
-import android.widget.Toast
 import com.qedron.gateway.GatewayServiceUtil.SMS_NUMBER
 
 class SmsSentReceiver : BroadcastReceiver() {
     val TAG = "TRACK_SMS_STATUS"
     override fun onReceive(context: Context, intent: Intent) {
-        val phone = intent.getStringExtra(SMS_NUMBER)
         when (resultCode) {
             Activity.RESULT_OK -> {
                 Log.d(TAG, "SMS sent")
