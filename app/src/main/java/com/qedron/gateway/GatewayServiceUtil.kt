@@ -8,6 +8,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -35,9 +36,10 @@ object GatewayServiceUtil {
         return false
     }
 
-    fun notifyStat(context: Context){
-       val stat = getStat(context)
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    fun notifyStat(context: Context) {
+        val stat = getStat(context)
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 STATUS_CHANNEL_ID,
@@ -51,11 +53,14 @@ object GatewayServiceUtil {
         val timeoutMs = 1000L * 60 * 60 * 6
 
         val intent = Intent(context, MainActivity::class.java)
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_IMMUTABLE else 0
+        val flags =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_IMMUTABLE else 0
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, flags)
 
-        val title = "Today's messages: ${if(stat.last.isNullOrEmpty()) "no messages" else stat.count}${if(stat.count > 0) ", sent: ${stat.sent}, delivered: ${stat.delivered}" else ""} ${if(stat.failed > 0) ", failed:${stat.failed}" else ""}"
-        val detail = "Last event: ${if(stat.last.isNullOrEmpty()) "no event" else stat.last} \n\nLast message: ${if(stat.message.isNullOrEmpty()) "no message" else stat.message}"
+        val title =
+            "Today's messages: ${if (stat.last.isNullOrEmpty()) "no messages" else stat.count}${if (stat.count > 0) ", sent: ${stat.sent}, delivered: ${stat.delivered}" else ""} ${if (stat.failed > 0) ", failed:${stat.failed}" else ""}"
+        val detail =
+            "Last event: ${if (stat.last.isNullOrEmpty()) "no event" else stat.last} \n\nLast message: ${if (stat.message.isNullOrEmpty()) "no message" else stat.message}"
         val builder = NotificationCompat.Builder(context, STATUS_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notif)
             .setPriority(NotificationCompat.PRIORITY_MIN)
@@ -67,7 +72,7 @@ object GatewayServiceUtil {
         notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
 
-    fun getStat(context: Context): Stat {
+    private fun getStat(context: Context): Stat {
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().time)
         val sharedPreference =  context.getSharedPreferences("SMS_COUNT",Context.MODE_PRIVATE)
         val date = sharedPreference.getString(TODAY,"")
@@ -89,20 +94,20 @@ object GatewayServiceUtil {
                 today:String?=null,
                 last:String?=null,
                 message:String?=null,
-                count:Int=0,
-                sent:Int=-0,
-                delivered:Int=0,
-                failed:Int=0,
+                count:Int=-1,
+                sent:Int=-1,
+                delivered:Int=-1,
+                failed:Int=-1,
     ){
         val sharedPreference =  context.getSharedPreferences("SMS_COUNT",Context.MODE_PRIVATE)
         val editor = sharedPreference.edit()
         if(!today.isNullOrEmpty()) editor.putString(TODAY,today)
         if(!last.isNullOrEmpty()) editor.putString(LAST,last)
         if(!message.isNullOrEmpty()) editor.putString(MESSAGE,message)
-        if(count > 0) editor.putInt(COUNT,count)
-        if(sent > 0) editor.putInt(SENT,sent)
-        if(delivered > 0) editor.putInt(DELIVERED,delivered)
-        if(failed > 0) editor.putInt(FAILED,failed)
+        if(count > -1) editor.putInt(COUNT,count)
+        if(sent > -1) editor.putInt(SENT,sent)
+        if(delivered > -1) editor.putInt(DELIVERED,delivered)
+        if(failed > -1) editor.putInt(FAILED,failed)
         editor.apply()
     }
 
