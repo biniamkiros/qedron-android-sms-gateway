@@ -8,7 +8,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -90,7 +89,7 @@ object GatewayServiceUtil {
         }
     }
 
-    public fun setStat(context: Context,
+    fun setStat(context: Context,
                 today:String?=null,
                 last:String?=null,
                 message:String?=null,
@@ -111,7 +110,7 @@ object GatewayServiceUtil {
         editor.apply()
     }
 
-    public fun increment(context: Context, name:String){
+    fun increment(context: Context, name:String){
         val stat = getStat(context)
         when(name){
             COUNT-> setStat(context, count=stat.count + 1)
