@@ -90,7 +90,7 @@ object GatewayServiceUtil {
         }
     }
 
-    fun setStat(context: Context,
+    public fun setStat(context: Context,
                 today:String?=null,
                 last:String?=null,
                 message:String?=null,
@@ -111,7 +111,7 @@ object GatewayServiceUtil {
         editor.apply()
     }
 
-    fun increment(context: Context, name:String){
+    public fun increment(context: Context, name:String){
         val stat = getStat(context)
         when(name){
             COUNT-> setStat(context, count=stat.count + 1)
