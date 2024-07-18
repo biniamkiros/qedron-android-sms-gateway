@@ -10,9 +10,8 @@ This is useful for developers for one reason or another, cannot use paid sms gat
 
 ### Dependencies
 
-- Describe any prerequisites, libraries, OS version, etc., needed before installing program.
 - the app uses firebase cloud messaging to communicate with your server.
-- You need to edit your device settings through adb to increase the max sms you can send in 30mins(default is 30). You can read how to do it [here](https://www.xda-developers.com/change-sms-limit-android/)
+- You need to edit your device settings through adb to increase the max sms you can send in 30mins(default is 30). You can read how to do it [here](https://www.xda-developers.com/change-sms-limit-android/) and [here](https://www.xda-developers.com/install-adb-windows-macos-linux/)
 
 ### Installing
 
