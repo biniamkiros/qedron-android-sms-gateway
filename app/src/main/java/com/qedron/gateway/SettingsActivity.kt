@@ -3,6 +3,7 @@ package com.qedron.gateway
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceFragmentCompat
 
 
@@ -18,7 +19,7 @@ class SettingsActivity : AppCompatActivity() {
                 .commit()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        val colorDrawable = ColorDrawable(resources.getColor(R.color.colorBackground))
+        val colorDrawable = ColorDrawable(ContextCompat.getColor(this,R.color.colorBackground))
         supportActionBar?.setBackgroundDrawable(colorDrawable)
     }
 
