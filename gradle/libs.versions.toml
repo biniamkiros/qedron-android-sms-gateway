@@ -1,14 +1,24 @@
 [versions]
 agp = "8.3.1"
+compiler = "1.0.0"
 kotlin = "1.9.0"
 coreKtx = "1.10.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
+kotlinCsvJs = "1.9.3"
+kotlinCsvJvm = "1.9.3"
 lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.7.0"
 composeBom = "2023.08.00"
 firebaseMessagingKtx = "24.0.0"
+roomKtx = "2.6.1"
+roomCompiler = "2.6.1"
+roomRuntime = "2.6.1"
+constraintlayout = "2.1.4"
+material = "1.12.0"
+appcompat = "1.6.1"
+preference = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -30,9 +40,19 @@ javax-servlet = { module = "javax.servlet:javax.servlet-api", version = "4.0.1" 
 jetty-server = { module = "org.eclipse.jetty:jetty-server", version = "8.1.21.v20160908" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.6.0" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+#kotlin-csv-js = { module = "com.github.doyaaaaaken:kotlin-csv-js", version.ref = "kotlinCsvJs" }
+kotlin-csv-jvm = { module = "com.github.doyaaaaaken:kotlin-csv-jvm", version.ref = "kotlinCsvJvm" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version = "4.4.0" }
+google-devtools-ksp = { id = "com.google.devtools.ksp", version = "1.9.10-1.0.13" }
 

@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.google.devtools.ksp)
 }
 
 android {
@@ -70,7 +71,19 @@ dependencies {
     // Import the Firebase BoM
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.material)
 
+    //csv
+    implementation(libs.kotlin.csv.jvm) // for JVM platform
+//    implementation(libs.kotlin-csv.js) // for Kotlin JS platform
+
+    // Room sqlite db
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.preference)
+    ksp (libs.room.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -80,6 +93,4 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-//    "qedronImplementation"(libs.javax.servlet)
-//    "qedronImplementation"(libs.jetty.server)
 }

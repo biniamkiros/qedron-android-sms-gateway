@@ -1,50 +1,100 @@
 package com.qedron.gateway
 
 import android.Manifest.permission.SEND_SMS
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
-import android.preference.PreferenceManager
+import android.view.ContextThemeWrapper
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
+import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.google.firebase.messaging.FirebaseMessaging
 import com.qedron.gateway.databinding.ActivityMainBinding
-import com.qedron.gateway.ui.theme.GatewayTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.net.Inet4Address
 import java.net.NetworkInterface
 import java.util.*
 
+
 class MainActivity : ComponentActivity() {
+
+    private lateinit var dbHelper: DatabaseHelperImpl
+
+    // Job and Dispatcher are combined into a CoroutineContext which
+    // will be discussed shortly
+    private val scope = CoroutineScope(Job() + Dispatchers.Main)
 
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var binding: ActivityMainBinding
 
-    companion object {
-        private const val PERMISSION_REQUEST_SEND_SMS: Int = 999
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            GatewayTheme {
-                // A surface container using the 'background' color from the theme
-//                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-//                    Greeting("Android")
-//                }
+    private var pickFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            // The result data contains a URI for the document or directory that
+            // the user selected.
+            result.data?.data?.also { uri ->
+                // Perform operations on the document using its URI.
+                importContacts(uri)
             }
         }
+    }
+    private val permReqLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val granted = permissions.entries.all {
+                it.value
+            }
+            if (granted) {
+                initFirebase()
+            } else {
+                Toast.makeText(
+                    applicationContext,
+                    "SMS permission grant failed. Grant from app settings.", Toast.LENGTH_LONG
+                ).show()
+                finish()
+            }
+        }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        actionBar?.title = "SMS gateway"
+        actionBar?.setHomeButtonEnabled(true)
+
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        dbHelper = DatabaseHelperImpl(ContactDatabase.getDatabase(this))
+
+        binding.bottomAppBar.setNavigationOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+
+        binding.bottomAppBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.import_contact -> {
+                    pickFile()
+                    true
+                }
+                else -> false
+            }
+        }
+
+        binding.broadcastBtn.setOnClickListener {  openBroadcastSheet() }
 
     }
 
@@ -60,9 +110,8 @@ class MainActivity : ComponentActivity() {
                     SEND_SMS
                 )
             ) {
-                ActivityCompat.requestPermissions(
-                    this, arrayOf<String>(SEND_SMS),
-                    PERMISSION_REQUEST_SEND_SMS
+                permReqLauncher.launch(
+                    arrayOf(SEND_SMS),
                 )
                 false
             } else {
@@ -75,38 +124,12 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            PERMISSION_REQUEST_SEND_SMS -> {
-                if (grantResults.isNotEmpty()
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                ) {
-                    initFirebase()
-                } else {
-                    Toast.makeText(
-                        applicationContext,
-                        "SMS permission grant failed. Grant from app settings.", Toast.LENGTH_LONG
-                    ).show()
-                    finish()
-                    return
-                }
-            }
-        }
-    }
-
     private fun initFirebase(){
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 binding.gatewayCloudKey.text = task.result
             }
         }
-
         binding.gatewayLocalKey.text = getKey()
         binding.gatewayLocalEndpoints.text = getAddressList().joinToString("\n")
 
@@ -129,27 +152,102 @@ class MainActivity : ComponentActivity() {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
 
         binding.gatewayCloudKeyHolder.setOnClickListener {
-            clipboard?.text = binding.gatewayCloudKey.text
+            clipboard?.setPrimaryClip(ClipData.newPlainText("key", binding.gatewayCloudKey.text))
             Toast.makeText(this, R.string.gateway_copied_toast, Toast.LENGTH_SHORT).show()
         }
         binding.gatewayLocalKeyHolder.setOnClickListener {
-            clipboard?.text = binding.gatewayLocalKey.text
+            clipboard?.setPrimaryClip(ClipData.newPlainText("key", binding.gatewayLocalKey.text))
             Toast.makeText(this, R.string.gateway_copied_toast, Toast.LENGTH_SHORT).show()
         }
         binding.gatewayLocalEndpointsHolder.setOnClickListener {
-            clipboard?.text = binding.gatewayLocalEndpoints.text
+            clipboard?.setPrimaryClip(ClipData.newPlainText("key", binding.gatewayLocalEndpoints.text))
             Toast.makeText(this, R.string.gateway_copied_toast, Toast.LENGTH_SHORT).show()
         }
 
         GatewayServiceUtil.notifyStat(this)
 
     }
+
     override fun onResume() {
         super.onResume()
-
         if(checkSMSPermission()) initFirebase()
+        updateContactCount()
+    }
 
+    override fun onDestroy() {
+        cleanUp()
+        super.onDestroy()
+    }
 
+    @Throws(IOException::class)
+    private fun importContacts(uri: Uri) {
+        val dialog = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AlertDialogCustom))
+            .setCancelable(false)
+            .setView(R.layout.progress_dialog).create()
+        val mimeType = contentResolver.getType(uri)
+        if(mimeType.toString() == "text/comma-separated-values") {
+            dialog.show()
+            scope.launch {
+                withContext(Dispatchers.IO) {
+                    val contentResolver = applicationContext.contentResolver
+                    contentResolver.openInputStream(uri)?.use { inputStream ->
+                        val dbHelper =
+                            DatabaseHelperImpl(ContactDatabase.getDatabase(this@MainActivity))
+                        var size = 0
+                        val rows: List<Map<String, String>> = csvReader().readAllWithHeader(inputStream)
+                        val total = rows.size
+                        rows.forEachIndexed { index, r ->
+                            val name = if(r["name"].isNullOrEmpty()) "" else r["name"]
+                            val phone = if(r["phone"].isNullOrEmpty()) "" else r["phone"]
+                            if(phone !== null && phone.isNotEmpty()) {
+                                withContext(Dispatchers.Main) {
+                                    val update = "processing ${index+1}/${total} contacts..."
+                                    dialog.findViewById<TextView>(R.id.progress_msg).text = update
+                                }
+                                dbHelper.insertContact(
+                                    Contact(
+                                        name = name,
+                                        phoneNumber = "0" + phone.toString().takeLast(9),
+                                        lastContact = null,
+                                    )
+                                )
+                                size++
+                            }
+                        }
+                        withContext(Dispatchers.Main) {
+                            dialog.cancel()
+                            val text = if(size > 0)
+                                "Imported to $size contacts"
+                            else
+                                "Import not successful. Make sure the file contains at least on column named 'phone'"
+                            Toast.makeText(
+                                this@MainActivity,text,
+                                Toast.LENGTH_LONG
+                            ).show()
+                            updateContactCount()
+                        }
+                    }
+                }
+            }
+        } else {
+            Toast.makeText(this, "only csv files containing column 'phone' are allowed", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun cleanUp() {
+        // Cancel the scope to cancel ongoing coroutines work
+        scope.cancel()
+    }
+
+    private fun updateContactCount() {
+        scope.launch {
+            withContext(Dispatchers.IO) {
+                val size = dbHelper.countContacts()
+                withContext(Dispatchers.Main) {
+                    binding.contactsBtn.text = if(size >0 ) getString(R.string.contacts, size) else getString(R.string.no_contacts)
+                }
+            }
+        }
     }
 
     private fun getKey(): String {
@@ -187,21 +285,29 @@ class MainActivity : ComponentActivity() {
         return super.getPackageName()
     }
 
-}
+    private fun pickFile(){
+        val mimetypes = arrayOf(
+//            "text/plain",
+//            "application/vnd.ms-excel",
+            "text/x-csv",
+            "*/csv",
+            "application/csv",
+            "application/x-csv",
+            "text/csv",
+            "text/comma-separated-values",
+            "text/x-comma-separated-values",
+            "text/tab-separated-values"
+        )
+        val intent = Intent(Intent.ACTION_GET_CONTENT ).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, mimetypes)
+        }
 
+        pickFileLauncher.launch(intent)
+    }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-            text = "Hello $name!",
-            modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    GatewayTheme {
-        Greeting("Android")
+    private fun openBroadcastSheet() {
+        BroadcastBottomSheet(this).show()
     }
 }

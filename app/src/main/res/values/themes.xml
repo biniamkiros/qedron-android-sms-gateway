@@ -1,6 +1,224 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.Gateway" parent="android:ThemeOverlay.Material.Dark.ActionBar" />
-<!--    parent="android:Theme.Material.Light.NoActionBar" />-->
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorSecondary">@color/colorSurface</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/colorTextOnSurface</item>
+        <item name="android:textColorSecondary">@color/colorTextOnBackground</item>
+        <item name="android:textColor">@color/colorTextOnBackground</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorTextOnSurface</item>
+        <item name="colorError">@color/colorError</item>
+        <item name="colorOnError">@color/colorTextOnError</item>
+        <item name="colorButtonNormal">@color/colorAccent</item>
+        <!-- custom items -->
+        <item name="android:windowDrawsSystemBarBackgrounds" >true</item>
+        <item name="android:statusBarColor" >@android:color/transparent</item>
+        <item name="android:navigationBarColor" >@color/colorSurfaceLight</item>
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+        <item name="snackbarStyle">@style/Widget.App.Snackbar</item>
+        <item name="snackbarButtonStyle">@style/Widget.App.SnackbarButton</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="android:windowActivityTransitions" >true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+        <item name="android:navigationBarDividerColor" tools:targetApi="o_mr1">@color/colorSurfaceLight</item>
+
+    </style>
+
+    <style name="SettingTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorSecondary">@color/colorSurface</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/colorTextOnSurface</item>
+        <item name="android:textColorSecondary">@color/colorTextOnBackground</item>
+        <item name="android:textColor">@color/colorTextOnBackground</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorTextOnSurface</item>
+        <item name="colorError">@color/colorError</item>
+        <item name="colorOnError">@color/colorTextOnError</item>
+        <item name="colorButtonNormal">@color/colorAccent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds" >true</item>
+        <item name="android:statusBarColor" >@android:color/transparent</item>
+        <item name="android:navigationBarColor" >@color/colorBackground</item>
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+        <item name="snackbarStyle">@style/Widget.App.Snackbar</item>
+        <item name="snackbarButtonStyle">@style/Widget.App.SnackbarButton</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="android:windowActivityTransitions" >true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+        <item name="android:navigationBarDividerColor" tools:targetApi="o_mr1">@color/colorBackground</item>
+
+    </style>
+
+    <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!-- Used for the buttons -->
+        <item name="colorAccent">@color/colorAccent</item>
+        <!-- Used for the title and text -->
+        <item name="android:textColorPrimary">@color/colorPrimary</item>
+        <!-- Used for the background -->
+        <item name="android:background">@color/colorSurfaceLight</item>
+    </style>
+
+    <style name="AppTheme.PreviewFix" parent="AppTheme">
+        <item name="buttonStyle">@style/AppTheme.Button.PreviewFix</item>
+    </style>
+
+    <style name="AppTheme.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:background">@color/colorAccent</item>
+        <item name="android:textColor">@color/colorTextOnSecondary</item>
+    </style>
+
+    <style name="AppTheme.Button.PreviewFix" parent="Widget.MaterialComponents.Button.UnelevatedButton"/>
+
+    <style name="FullscreenTheme" parent="AppTheme">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+    </style>
+
+    <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/colorBackground</item>
+    </style>
+
+    <!--    custom styles-->
+    <style name="SplashScreenTheme" parent="AppTheme.NoActionBar">
+        <!--        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>-->
+        <item name="android:windowActionBarOverlay">true</item>
+<!--        <item name="android:windowBackground">@drawable/splash_background</item>-->
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <style name="EngineWidgetTheme" parent="AppTheme.NoActionBar">
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorSecondary">@color/colorSurface</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/colorTextOnSurface</item>
+        <item name="android:textColorSecondary">@color/colorTextOnBackground</item>
+        <item name="android:textColor">@color/colorTextOnBackground</item>
+
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorTextOnSurface</item>
+        <item name="colorError">@color/colorError</item>
+        <item name="colorOnError">@color/colorTextOnError</item>
+        <item name="colorButtonNormal">@color/colorAccent</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:colorControlNormal">@color/colorTextOnSurface</item>
+        <item name="colorControlNormal">@color/colorTextOnSurface</item>
+        <item name="android:windowDrawsSystemBarBackgrounds" >true</item>
+        <item name="android:navigationBarColor">@color/colorSurfaceLight</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">false</item>
+
+    </style>
+
+
+
+    <style name="AuthTheme.NoActionBar" parent="Theme.MaterialComponents">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorSecondary">@color/colorSurface</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/colorTextOnSurface</item>
+        <item name="android:textColorSecondary">@color/colorTextOnBackground</item>
+        <item name="android:textColor">@color/colorTextOnBackground</item>
+
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorTextOnSurface</item>
+        <item name="colorError">@color/colorError</item>
+        <item name="colorOnError">@color/colorTextOnError</item>
+        <item name="colorButtonNormal">@color/colorAccent</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:colorControlNormal" tools:ignore="NewApi">@color/colorTextOnSurface</item>
+        <item name="colorControlNormal">@color/colorTextOnSurface</item>
+        <item name="android:statusBarColor" tools:ignore="NewApi">@color/colorBackground</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/colorSurfaceLight</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">false</item>
+    </style>
+
+    <style name="ToolbarStyle" parent="Base.Widget.AppCompat.Toolbar">
+        <item name="android:background">@color/colorSurfaceLight</item>
+        <item name="titleTextColor">@color/colorTextOnSurface</item>
+        <item name="titleTextAppearance">@style/toolbarTitleStyle</item>
+        <item name="android:colorControlNormal">@color/colorTextOnSurface</item>
+        <item name="colorControlNormal">@color/colorTextOnSurface</item>
+        <item name="android:titleTextAppearance">@style/toolbarTitleStyle</item>
+
+    </style>
+
+    <style name="AppBottomSheetDialogTheme" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+        <item name="android:statusBarColor" >@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/colorSurfaceLight</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorSecondary">@color/colorSurface</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <!--    snackbar start-->
+    <style name="Widget.App.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Snackbar</item>
+        <item name="actionTextColorAlpha">1</item>
+    </style>
+
+    <style name="Widget.App.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">@color/colorSnackBarButton</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Snackbar" parent="">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnSurface">@color/colorSnackBarSurface</item>
+    </style>
+    <!--    snackbar end-->
+
+    <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/rounded_dialog</item>
+    </style>
+
+    <style name="toolbarTitleStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">20sp</item>
+        <!--        <item name="titleTextAppearance">@style/RobotoToolBarTitleStyle</item>-->
+        <!--        <item name="subtitleTextAppearance">@style/RobotoToolBarSubtitleStyle</item>-->
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+    <!--    plate text style-->
+    <style name="TextPlateStyle">
+        <item name="android:shadowColor">@color/colorBackground</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">2</item>
+<!--        <item name="android:fontFamily">@font/plate</item>-->
+    </style>
+
 </resources>

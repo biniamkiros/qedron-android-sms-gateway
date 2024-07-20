@@ -7,24 +7,20 @@ import android.content.Intent
 import android.util.Log
 
 class SmsDeliveredReceiver : BroadcastReceiver() {
-    val TAG = "TRACK_SMS_STATUS"
+    private val tag = "TRACK_SMS_STATUS"
     override fun onReceive(context: Context, intent: Intent) {
         when (resultCode) {
             Activity.RESULT_OK -> {
-                Log.d(TAG, "SMS delivered")
+                Log.d(tag, "SMS delivered")
                 GatewayServiceUtil.increment(
                     context,
                     GatewayServiceUtil.DELIVERED
-                )
-                GatewayServiceUtil.setStat(
-                        context,
-                last = "success - sms delivered"
                 )
                 GatewayServiceUtil.notifyStat(context)
             }
 
             Activity.RESULT_CANCELED -> {
-                Log.d(TAG, "SMS not delivered")
+                Log.d(tag, "SMS not delivered")
                 GatewayServiceUtil.setStat(
                     context,
                     last = "error - sms not delivered"

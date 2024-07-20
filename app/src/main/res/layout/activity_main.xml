@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/gateway_coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/background_dark">
+    android:background="@color/colorBackground">
+    <!--    android:background="#223036">-->
 
 
     <androidx.core.widget.NestedScrollView
@@ -24,40 +25,80 @@
             >
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/qedron_android_sms"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="24dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="10"
+                android:layout_gravity="center"
+                android:layout_marginBottom="18dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/gateway"
+                    android:layout_weight="7"
+                    android:textColor="@color/white"
+                    android:paddingStart="12sp"
+                    android:paddingBottom="12dp"
+                    android:paddingEnd="12dp"
+                    android:textSize="36sp"/>
+
+                <Button
+                    android:id="@+id/contactsBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_contacts"
+                    android:layout_gravity="center"
+                    android:layout_weight="3"
+                    android:textColor="@color/colorAccent"
+                    android:textAllCaps="false"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"/>
+
+            </LinearLayout>
+
+            <TextView
                 android:id="@+id/gateway_cloud_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="CLOUD SERVICE"
-                android:textColor="@color/purple_500"
+                android:text="@string/cloud_service"
+                android:textColor="@color/colorAccent"
                 android:padding="12dp"/>
 
             <RelativeLayout
                 android:id="@+id/gateway_cloud_key_holder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="12dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:padding="12dp"
-                android:background="?android:selectableItemBackground">
+                android:background="?android:selectableItemBackground"
+                >
 
                 <TextView
                     android:id="@+id/gateway_cloud_key_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:text="Token" />
+                    android:textColor="@color/colorTextOnSurface"
+                    android:text="@string/token" />
 
                 <TextView
                     android:id="@+id/gateway_cloud_key"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/colorTextOnSurfaceAlpha"
                     android:layout_below="@+id/gateway_cloud_key_label" />
 
             </RelativeLayout>
 
-<!--            <include-->
-<!--                android:id="@+id/gateway_cloud_divider"-->
-<!--                layout="@layout/divider" />-->
             <View android:layout_width="match_parent"
                 android:layout_height="0.5dp"
                 android:alpha="0.5"
@@ -68,8 +109,8 @@
                 android:id="@+id/gateway_local_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="LOCAL SERVICE"
-                android:textColor="@color/purple_500"
+                android:text="@string/local_service"
+                android:textColor="@color/colorAccent"
                 android:padding="12dp"/>
 
             <RelativeLayout
@@ -84,13 +125,12 @@
                     android:id="@+id/gateway_local_enable"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Enable service"
+                    android:text="@string/enable_local_service"
                     android:clickable="false"
-                    android:gravity="left|center"
+                    android:textColor="@color/colorTextOnSurface"
+                    android:gravity="start|center"
                     android:layoutDirection="rtl"
                     />
-<!--                //or "center_vertical" for center text-->
-
 
             </RelativeLayout>
 
@@ -98,20 +138,24 @@
                 android:id="@+id/gateway_local_key_holder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="12dp">
+                android:padding="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?android:selectableItemBackground">
 
                 <TextView
                     android:id="@+id/gateway_local_key_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:text="Token" />
+                    android:textColor="@color/colorTextOnSurface"
+                    android:text="@string/token" />
 
                 <TextView
                     android:id="@+id/gateway_local_key"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/gateway_local_key_label" />
+                    android:textColor="@color/colorTextOnSurfaceAlpha"
+                    android:layout_below="@+id/gateway_local_key_label"/>
 
             </RelativeLayout>
 
@@ -125,17 +169,41 @@
                     android:id="@+id/gateway_local_endpoints_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:text="Endpoints" />
+                    android:textColor="@color/colorTextOnSurface"
+                    android:text="@string/endpoints" />
 
                 <TextView
                     android:id="@+id/gateway_local_endpoints"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/colorTextOnSurfaceAlpha"
                     android:layout_below="@+id/gateway_local_endpoints_label" />
+
 
             </RelativeLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-</RelativeLayout>
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        style="@style/Widget.MaterialComponents.BottomAppBar"
+        app:navigationIcon="@drawable/ic_settings_24"
+        app:menu="@menu/menu_main"
+        android:backgroundTint="@color/colorSurfaceLight"
+        />
+<!--    app:navigationIcon="@drawable/ic_import_contacts_24"-->
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/broadcastBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_broadcast_24"
+        app:layout_anchor="@id/bottomAppBar"
+        android:contentDescription="@string/broadcast"
+        android:backgroundTint="@color/colorAccent"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

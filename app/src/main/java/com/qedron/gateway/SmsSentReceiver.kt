@@ -8,18 +8,17 @@ import android.telephony.SmsManager
 import android.util.Log
 
 class SmsSentReceiver : BroadcastReceiver() {
-    val TAG = "TRACK_SMS_STATUS"
+    private val tag = "TRACK_SMS_STATUS"
     override fun onReceive(context: Context, intent: Intent) {
         when (resultCode) {
             Activity.RESULT_OK -> {
-                Log.d(TAG, "SMS sent")
+                Log.d(tag, "SMS sent")
                 GatewayServiceUtil.increment(context, GatewayServiceUtil.COUNT)
                 GatewayServiceUtil.increment(context, GatewayServiceUtil.SENT)
-                GatewayServiceUtil.setStat(context,last="success - sms sent")
                 GatewayServiceUtil.notifyStat(context)
             }
             SmsManager.RESULT_ERROR_GENERIC_FAILURE -> {
-                Log.d(TAG,   "Generic failure")
+                Log.d(tag,   "Generic failure")
                 GatewayServiceUtil.increment(context, GatewayServiceUtil.COUNT)
                 GatewayServiceUtil.increment(context,
                     GatewayServiceUtil.FAILED
@@ -28,7 +27,7 @@ class SmsSentReceiver : BroadcastReceiver() {
                 GatewayServiceUtil.notifyStat(context)
             }
             SmsManager.RESULT_ERROR_NO_SERVICE -> {
-                Log.d(TAG, "No service")
+                Log.d(tag, "No service")
                 GatewayServiceUtil.increment(context, GatewayServiceUtil.COUNT)
                 GatewayServiceUtil.increment(context,
                     GatewayServiceUtil.FAILED
@@ -37,7 +36,7 @@ class SmsSentReceiver : BroadcastReceiver() {
                 GatewayServiceUtil.notifyStat(context)
             }
             SmsManager.RESULT_ERROR_NULL_PDU -> {
-                Log.d(TAG, "Null PDU")
+                Log.d(tag, "Null PDU")
                 GatewayServiceUtil.increment(context, GatewayServiceUtil.COUNT)
                 GatewayServiceUtil.increment(context,
                     GatewayServiceUtil.FAILED
@@ -46,7 +45,7 @@ class SmsSentReceiver : BroadcastReceiver() {
                 GatewayServiceUtil.notifyStat(context)
             }
             SmsManager.RESULT_ERROR_RADIO_OFF -> {
-                Log.d(TAG, "Radio off")
+                Log.d(tag, "Radio off")
                 GatewayServiceUtil.increment(context, GatewayServiceUtil.COUNT)
                 GatewayServiceUtil.increment(context,
                     GatewayServiceUtil.FAILED

@@ -1,3 +1,45 @@
 <resources>
     <string name="app_name">Qedron gateway</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="frequency_header">Frequency</string>
+    <string name="max_header">Max messages</string>
+
+    <!-- Messages Preferences -->
+    <string name="frequency_title">Hot contact duration</string>
+
+    <!-- Bulk Preferences -->
+    <string name="bulk_title">Maximum allowed messages per broadcast</string>
+
+    <!-- Max Preferences -->
+    <string name="max_title">Lifetime sms message per person</string>
+    <string name="limit_title">Limit lifetime messages per person</string>
+    <string name="limit_summary_on">A person is excluded from broadcast list after a contact has received a maximum sms messages
+    </string>
+    <string name="limit_summary_off">The number of sms messages a contact receives is unrestricted</string>
+    <string name="abort">Abort</string>
+    <string name="contacts_available">%1$d/%2$d contacts available for broadcast</string>
+    <string name="fetching_result">fetching result…</string>
+    <string name="preparing_for_broadcast">preparing for broadcast…</string>
+    <string name="broadcast_sent_to_available_contacts">Broadcast sent to %1$d/%2$d available contacts</string>
+    <string name="done">Done</string>
+    <string name="contacts">%1$d contacts</string>
+    <string name="qedron_android_sms">qedron android SMS</string>
+    <string name="gateway">Gateway</string>
+    <string name="no_contacts">No contacts</string>
+    <string name="cloud_service">CLOUD SERVICE</string>
+    <string name="token">Token</string>
+    <string name="local_service">LOCAL SERVICE</string>
+    <string name="enable_local_service">Enable local service</string>
+    <string name="broadcast">broadcast</string>
+    <string name="endpoints">Endpoints</string>
+    <string name="loading">Loading…</string>
+    <string name="type_your_announcement_or_promo">Type your announcement or promo</string>
+    <string name="loading_contacts">loading available contacts for broadcast…</string>
+    <string name="completed_icon">Completed icon</string>
+    <string name="broadcast_message">Broadcast message</string>
+    <string name="send_sms_message_description">Send sms message for all your contacts saved on the app database. Make sure your phone has enough credit to send mass messages.</string>
+    <string name="one_moment">one moment…</string>
+    <string name="import_contacts">import contacts</string>
 </resources>

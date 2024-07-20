@@ -7,4 +7,43 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#FDD835</color>
+    <color name="colorPrimaryDark">#F9A825</color>
+    <color name="colorAccent">#FDD835</color>
+    <color name="colorSecondary">#FF8F00</color>
+
+    <color name="colorBackground">#111E24</color>
+    <color name="colorSurface">#223036</color>
+    <color name="colorSurfaceLight">#2B383E</color>
+    <color name="colorPolyline">#FFC107</color>
+    <color name="colorYesterdayPolyline">#f27602</color>
+    <color name="colorOldPolyline">#d1d1cf</color>
+    <color name="colorPolylineDark">#0064CE</color>
+    <color name="colorParkeDistancePolyline">#09AFB5</color>
+    <color name="colorRefresh">#FDD835</color>
+    <color name="colorBalance">#FDD835</color>
+    <color name="colorSurfaceLightScrimLight">#C3000000</color>
+    <color name="colorError">#CF6679</color>
+    <color name="colorAttention">#F44336</color>
+    <color name="colorSuccess">#09AFB5</color>
+    <color name="colorButton">#E1E1E1</color>
+    <color name="colorGreen">#66CA8E</color>
+    <color name="colorRed">#F6837B</color>
+    <color name="colorGrey">#777777</color>
+    <color name="colorAlpha">#99000000</color>
+    <color name="colorSnackBarButton">#0064CE</color>
+    <color name="colorSnackBarSurface">#EFEFEF</color>
+    <color name="colorWatchOngoing">#FDD835</color>
+    <color name="colorWatchShock">#F57C00</color>
+    <color name="colorWatchViolation">#F44336</color>
+    <color name="colorNoWatch">#455A64</color>
+    <color name="colorWarning">#FF5566</color>
+    <color name="colorTextOnPrimary">#000000</color>
+    <color name="colorTextOnSecondary">#000000</color>
+    <color name="colorTextOnBackground">#E0E0E0</color>
+    <color name="colorTextOnSurface">#E1E1E1</color>
+    <color name="colorTextOnSurfaceAlpha">#99E1E1E1</color>
+    <color name="colorTextOnError">#000000</color>
+    <color name="colorTextOnColor">#66000000</color>
+
 </resources>
