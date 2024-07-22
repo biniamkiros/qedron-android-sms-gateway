@@ -45,6 +45,7 @@ object GatewayServiceUtil {
     }
 
     fun sendMessage(context: Context, phone:String, message: String): Boolean {
+
         try {
             val sentPendingIntents = ArrayList<PendingIntent>()
             val deliveredPendingIntents = ArrayList<PendingIntent>()
@@ -54,8 +55,14 @@ object GatewayServiceUtil {
             val deliveredPI = PendingIntent.getBroadcast(context, 0,
                 Intent(context, SmsDeliveredReceiver::class.java),  PendingIntent.FLAG_MUTABLE)
 
-            val sms = context.getSystemService(SmsManager::class.java)//SmsManager.getDefault()
+            val sms = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                context.getSystemService(SmsManager::class.java)
+            } else {
+                SmsManager.getDefault()
+            }
+
             val parts: ArrayList<String> = sms.divideMessage(message)
+
             parts.forEach { _ ->
                 sentPendingIntents.add(sentPI)
                 deliveredPendingIntents.add(deliveredPI)
