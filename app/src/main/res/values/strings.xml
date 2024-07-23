@@ -5,6 +5,7 @@
     <!-- Preference Titles -->
     <string name="frequency_header">Frequency</string>
     <string name="max_header">Max messages</string>
+    <string name="data_header">Data</string>
 
     <!-- Messages Preferences -->
     <string name="frequency_title">Hot contact duration</string>
@@ -18,6 +19,11 @@
     <string name="limit_summary_on">A person is excluded from broadcast list after a contact has received a maximum sms messages
     </string>
     <string name="limit_summary_off">The number of sms messages a contact receives is unrestricted</string>
+
+    <!-- Data Preferences -->
+    <string name="reset_title">Reset contacts list</string>
+    <string name="reset_summary">Clear your contact list if your imported data is bad, corrupted or before importing a fresh list of contacts.</string>
+
     <string name="abort">Abort</string>
     <string name="contacts_available">%1$d/%2$d contacts available for broadcast</string>
     <string name="fetching_result">fetching result…</string>
@@ -42,4 +48,23 @@
     <string name="send_sms_message_description">Send sms message for all your contacts saved on the app database. Make sure your phone has enough credit to send mass messages.</string>
     <string name="one_moment">one moment…</string>
     <string name="import_contacts">import contacts</string>
+
+    <string name="dialog_question_description">የንግግር:መግለጫ</string>
+    <string name="dialog_input">የንግግር:ገቢ፡ጽሁፍ</string>
+    <string name="dialog_question_title">የንግግር:ርዕስ</string>
+    <string name="dialog_action_negative">ሰርዝ</string>
+    <string name="dialog_action_positive">ቀጥል</string>
+    <string name="dialog_go_to_settings">ወደ፡ማቀናበሪያ፡ሂድ</string>
+    <string name="dialog_grant_tether_perm">ለቴዘር፡ፍቃድ፡ይስጡ</string>
+    <string name="dialog_locationShareDescription">ተሽከርካሪዎ፡ከእርስዎ፡ያለውን፡ርቀት፡መጠበቁን፡ለማወቅ፡የአካባቢ፡ማጋራት፡ያስፈልጋል።</string>
+    <string name="dialog_locationShareTitle">አካባቢዎን፡ያጋሩ</string>
+    <string name="dialog_reset">delete</string>
+    <string name="dialog_reset_desc">This process cannot be reversed. You will loose all contacts that you have previously imported</string>
+    <string name="dialog_reset_title">Are you sure?</string>
+    <string name="dialog_take_me_back">go back</string>
+    <string name="dialog_delete_account">ደምስስ</string>
+    <string name="dialog_delete_account_desc">ይህ፡የሚቀለበስ፡ድርጊት፡አይደለም።መለያዎ፡ለዘለዓለም፡ይሰረዛል።እርግጠኛ፡ይሁኑ።በጥንቃቄ፡ይቀጥሉ!</string>
+    <string name="dialog_delete_account_title">መለያዎን፡ለመደምሰስ፡እንደሚፈልጉ፡እርግጠኛ፡ነዎት?</string>
+    <string name="dialog_delete_account_take_me_back">ይቅርብኝ</string>
+    <string name="dialog_action_isolate">ነጥል</string>
 </resources>

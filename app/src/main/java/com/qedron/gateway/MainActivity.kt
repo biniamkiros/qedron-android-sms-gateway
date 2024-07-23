@@ -204,14 +204,17 @@ class MainActivity : ComponentActivity() {
                                     val update = "processing ${index+1}/${total} contacts..."
                                     dialog.findViewById<TextView>(R.id.progress_msg).text = update
                                 }
-                                dbHelper.insertContact(
-                                    Contact(
-                                        name = name,
-                                        phoneNumber = "0" + phone.toString().takeLast(9),
-                                        lastContact = null,
+                                val phoneNumber = "0" + phone.toString().takeLast(9)
+                                if(phoneNumber.length == 10) {
+                                    dbHelper.insertContact(
+                                        Contact(
+                                            name = name,
+                                            phoneNumber = "0" + phone.toString().takeLast(9),
+                                            lastContact = null,
+                                        )
                                     )
-                                )
-                                size++
+                                    size++
+                                }
                             }
                         }
                         withContext(Dispatchers.Main) {

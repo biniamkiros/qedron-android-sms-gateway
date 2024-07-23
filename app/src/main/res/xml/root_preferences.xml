@@ -40,4 +40,13 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/data_header">
+
+        <Preference
+            app:key="reset"
+            app:title="@string/reset_title"
+            app:summary="@string/reset_summary" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

@@ -3,9 +3,16 @@ package com.qedron.gateway
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -35,8 +42,54 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
+
+        private val scope = CoroutineScope(Job() + Dispatchers.Main)
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
+            findPreference<Preference>("reset")?.setOnPreferenceClickListener {
+
+                context?.let { it1 ->
+                    DialogBottomSheet(
+                        it1,
+                        getString(R.string.dialog_reset_title),
+                        getString(R.string.dialog_reset_desc),
+                        getString(R.string.dialog_take_me_back),
+                        getString(R.string.dialog_reset),
+                        true,
+                        R.color.colorError,
+                        object : DialogBottomSheet.DialogListener {
+                            override fun onGo(isGo: Boolean) {
+                                if (isGo) {
+                                    scope.launch {
+                                        withContext(Dispatchers.IO) {
+                                            try {
+                                                DatabaseHelperImpl(
+                                                    ContactDatabase.getDatabase(it1)
+                                                ).deleteAllContacts()
+                                                withContext(Dispatchers.Main) {
+                                                    Toast.makeText(
+                                                        it1, "You contact list has been reset.",
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
+                                                }
+                                            } catch (e: Exception) {
+                                                withContext(Dispatchers.Main) {
+                                                    Toast.makeText(
+                                                        it1,
+                                                        "Error deleting contacts. Try again later.",
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+                        }).show()
+                }
+                return@setOnPreferenceClickListener true
+            }
         }
     }
 }
