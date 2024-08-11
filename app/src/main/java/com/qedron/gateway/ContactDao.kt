@@ -124,7 +124,7 @@ interface ContactDao {
     @Query("SELECT COUNT(*) FROM contacts WHERE isTest = :isTest")
     fun countContacts(isTest:Boolean): Int
 
-    @Query("DELETE FROM contacts WHERE isTest = 1")
+    @Query("DELETE FROM contacts")
     fun deleteAllContacts()
 
     @Query(

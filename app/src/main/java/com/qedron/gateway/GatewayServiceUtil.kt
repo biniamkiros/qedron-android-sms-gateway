@@ -8,12 +8,14 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.telephony.SmsManager
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.preference.PreferenceManager
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -259,5 +261,30 @@ object GatewayServiceUtil {
             ))
         }
         return contacts
+    }
+
+
+    fun getBackupFile(context: Context): File? {
+        try {
+            val path =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).path + File.separator + context.getString(
+                    R.string.app_name
+                ) + File.separator + "gatewayDB.sqlite3"
+            val file = File(path)
+
+            if (!file.exists()) {
+                file.parentFile?.mkdirs()
+                file.createNewFile()
+                return file
+            }
+            return file
+        } catch (e:Exception){
+            Toast.makeText(
+                context,
+                "Error locating backup file.",
+                Toast.LENGTH_LONG
+            ).show()
+            return null
+        }
     }
 }

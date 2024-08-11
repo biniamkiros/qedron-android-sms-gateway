@@ -1,4 +1,6 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <PreferenceCategory app:title="@string/frequency_header">
 
@@ -53,7 +55,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/data_header">
+    <PreferenceCategory app:title="@string/contacts_header">
 
         <SwitchPreferenceCompat
             app:key="live"
@@ -77,6 +79,26 @@
             app:key="reset"
             app:title="@string/reset_title"
             app:summary="@string/reset_summary" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/contacts_header">
+
+        <Preference
+            app:key="backup"
+            app:title="@string/backup_title"
+            app:summary="@string/backup_summary" />
+
+        <Preference
+            app:key="restore"
+            app:title="@string/restore_title"
+            app:summary="@string/restore_summary" />
+
+        <Preference app:title=""
+            android:enabled="false"/>
+
+        <Preference app:title=""
+            android:enabled="false"/>
 
     </PreferenceCategory>
 

@@ -1,5 +1,6 @@
 package com.qedron.gateway
 
+import android.Manifest
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.SEND_SMS
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -62,7 +63,6 @@ class MainActivity : ComponentActivity() {
     var modifiedSize = 0
     private lateinit var bottomSheetDialog: BroadcastBottomSheet
     private lateinit var dbHelper: DatabaseHelperImpl
-    private lateinit var backup: RoomBackup
 
     // Job and Dispatcher are combined into a CoroutineContext which
     // will be discussed shortly
@@ -104,52 +104,69 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-    private val permWriteStorageReqLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val granted = permissions.entries.all {
-                it.value
-            }
-            if (granted) {
-                backupRoom()
-            } else {
-                Toast.makeText(
-                    applicationContext,
-                    "Storage permission grant failed. Grant from app settings.", Toast.LENGTH_LONG
-                ).show()
-            }
-        }
-
     private val permReadStorageReqLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val granted = permissions.entries.all {
                 it.value
             }
             if (granted) {
-                restoreRoom()
+                checkFresh()
             } else {
                 Toast.makeText(
-                    applicationContext,
+                    this,
                     "Storage permission grant failed. Grant from app settings.", Toast.LENGTH_LONG
                 ).show()
             }
         }
 
-    // Initialize the variable in before activity creation is complete.
-    @RequiresApi(Build.VERSION_CODES.R)
-    val storageBackupPermissionResultLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        if (Environment.isExternalStorageManager()) {
-            backupRoom()
-        }
-    }
-
     @RequiresApi(Build.VERSION_CODES.R)
     val storageRestorePermissionResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
-        if (Environment.isExternalStorageManager()) restoreRoom()
+        if (Environment.isExternalStorageManager()) checkFresh()
     }
+    private fun checkReadFilePermission():Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                Snackbar.make(
+                    findViewById(android.R.id.content),
+                    "Device storage permission needed!",
+                    Snackbar.LENGTH_INDEFINITE
+                ).setAnchorView(findViewById(R.id.broadcastBtn)).setAction("Settings") {
+                    try {
+                        val intent = Intent(
+                            ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                            Uri.parse("package:" + BuildConfig.APPLICATION_ID)
+                        )
+                        storageRestorePermissionResultLauncher.launch(intent)
+                    } catch (ex: Exception) {
+                        val intent = Intent()
+                        intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                        startActivity(intent)
+                    }
+                }
+                    .show()
+
+                return false
+            } else return true
+        } else if (ContextCompat.checkSelfPermission(
+                    this, READ_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            return if (!ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, READ_EXTERNAL_STORAGE)) {
+                permReadStorageReqLauncher.launch(arrayOf(READ_EXTERNAL_STORAGE))
+                false
+            } else {
+                Toast.makeText(this, "storage permission is required. Grant permission from app settings", Toast.LENGTH_LONG).show()
+                false
+            }
+        } else {
+            return true
+        }
+
+    }
+
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -168,8 +185,6 @@ class MainActivity : ComponentActivity() {
         setContentView(binding.root)
         actionBar?.title = "SMS gateway"
         actionBar?.setHomeButtonEnabled(true)
-
-        backup = RoomBackup(this)
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         dbHelper = DatabaseHelperImpl(ContactDatabase.getDatabase(this))
@@ -192,8 +207,8 @@ class MainActivity : ComponentActivity() {
 
         if(checkSMSPermission()) {
             initFirebase()
-            checkFresh()
         }
+        if(checkReadFilePermission()) checkFresh()
 
 
         viewModel.status.observe(this) { status ->
@@ -206,30 +221,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-    }
-
-    private fun checkFresh() {
-        if(sharedPreferences.getBoolean("fresh", true)){
-            val editor = sharedPreferences.edit()
-            if(getBackupFile() != null)
-                DialogBottomSheet(
-                    this,
-                    getString(R.string.dialog_restore_title),
-                    getString(R.string.dialog_restore_desc),
-                    getString(R.string.dialog_restore_cancel),
-                    getString(R.string.dialog_restore),
-                    false,
-                    R.color.colorError,
-                    object : DialogBottomSheet.DialogListener {
-                        override fun onGo(isGo: Boolean) {
-                            if (isGo) {
-                                restoreRoom()
-                            }
-                        }
-                    }).show()
-            editor.putBoolean("fresh", false)
-            editor.apply()
-        }
     }
 
     private fun checkSMSPermission():Boolean {
@@ -250,102 +241,6 @@ class MainActivity : ComponentActivity() {
                 false
             } else {
                 Toast.makeText(this, "sms permission is required. Grant permission from app settings", Toast.LENGTH_LONG).show()
-                false
-            }
-        } else {
-            return true
-        }
-
-    }
-
-    private fun checkWriteFilePermission():Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                Snackbar.make(
-                    findViewById<View>(android.R.id.content),
-                    "Device storage permission needed!",
-                    Snackbar.LENGTH_INDEFINITE
-                ).setAnchorView(findViewById<View>(R.id.broadcastBtn))
-                    .setAction("Settings") {
-                        try {
-                            val intent = Intent(
-                                ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                                Uri.parse("package:" + BuildConfig.APPLICATION_ID)
-                            )
-                            storageBackupPermissionResultLauncher.launch(intent)
-                        } catch (ex: Exception) {
-                            val intent = Intent()
-                            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                            startActivity(intent)
-                        }
-                    }
-                    .show()
-                return false
-            } else return true
-        } else if (ContextCompat.checkSelfPermission(
-                this,
-                 WRITE_EXTERNAL_STORAGE
-            )
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            return if (!ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    WRITE_EXTERNAL_STORAGE
-                )
-            ) {
-                permWriteStorageReqLauncher.launch(
-                    arrayOf(WRITE_EXTERNAL_STORAGE),
-                )
-                false
-            } else {
-                Toast.makeText(this, "storage permission is required. Grant permission from app settings", Toast.LENGTH_LONG).show()
-                false
-            }
-        } else {
-            return true
-        }
-    }
-
-    private fun checkReadFilePermission():Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                Snackbar.make(
-                    findViewById<View>(android.R.id.content),
-                    "Device storage permission needed!",
-                    Snackbar.LENGTH_INDEFINITE
-                ).setAnchorView(findViewById<View>(R.id.broadcastBtn))
-                    .setAction("Settings") {
-                        try {
-                            val intent = Intent(
-                                ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                                Uri.parse("package:" + BuildConfig.APPLICATION_ID)
-                            )
-                            storageRestorePermissionResultLauncher.launch(intent)
-                        } catch (ex: Exception) {
-                            val intent = Intent()
-                            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                            startActivity(intent)
-                        }
-                    }
-                    .show()
-
-                return false
-            } else return true
-        } else if (ContextCompat.checkSelfPermission(
-                this,
-                READ_EXTERNAL_STORAGE
-            )
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            return if (!ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    READ_EXTERNAL_STORAGE
-                )
-            ) {
-                permReadStorageReqLauncher.launch(arrayOf(READ_EXTERNAL_STORAGE))
-                false
-            } else {
-                Toast.makeText(this, "storage permission is required. Grant permission from app settings", Toast.LENGTH_LONG).show()
                 false
             }
         } else {
@@ -708,23 +603,23 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun importOptions() {
-        DialogBottomSheet(
-            this,
-            getString(R.string.dialog_import_title),
-            getString(R.string.dialog_import_desc),
-            getString(R.string.dialog_import_file),
-            getString(R.string.dialog_import_restore),
-            true,
-            R.color.colorError,
-            object : DialogBottomSheet.DialogListener {
-                override fun onGo(isGo: Boolean) {
-                    if (isGo) {
-                        if(checkReadFilePermission()) restoreRoom()
-                    } else {
-                        pickFile()
-                    }
-                }
-            }).show()
+        pickFile()
+//        DialogBottomSheet(
+//            this,
+//            getString(R.string.dialog_import_title),
+//            getString(R.string.dialog_import_desc),
+//            getString(R.string.dialog_import_file),
+//            getString(R.string.dialog_import_restore),
+//            true,
+//            R.color.colorError,
+//            object : DialogBottomSheet.DialogListener {
+//                override fun onGo(isGo: Boolean) {
+//                    if (isGo) {
+//
+//                    } else {
+//                    }
+//                }
+//            }).show()
     }
 
     private fun pickFile(){
@@ -764,13 +659,7 @@ class MainActivity : ComponentActivity() {
 
     private fun showBroadcastDialog(){
         bottomSheetDialog = BroadcastBottomSheet(this, object : BroadcastBottomSheet.DialogListener {
-            override fun onBroadcastComplete(isGo: Boolean) {
-                if (isGo) {
-                    if (checkWriteFilePermission())
-                        backupRoom()
-//                    viewModel.abortBroadcast()
-                }
-            }
+            override fun onBroadcastComplete(isGo: Boolean) { }
         }, viewModel)
         bottomSheetDialog.show()
     }
@@ -783,94 +672,30 @@ class MainActivity : ComponentActivity() {
         ContextCompat.startForegroundService(this, Intent(this, BroadcastService::class.java))
     }
 
-    private fun getBackupFile():File? {
-        try {
-            val path =
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).path + File.separator + getString(
-                    R.string.app_name
-                ) + File.separator + "gatewayDB.sqlite3"
-            val file = File(path)
-
-            if (!file.exists()) {
-                file.parentFile?.mkdirs()
-                file.createNewFile()
-                return file
-            }
-            return file
-        } catch (e:Exception){
-            Toast.makeText(
-                this,
-                "Error locating backup file.",
-                Toast.LENGTH_LONG
-            ).show()
-            return null
-        }
-    }
-
-    private fun backupRoom() {
-        return
-        try {
-            val file = getBackupFile() ?: return
-            backup
-                .database(ContactDatabase.getDatabase(this))
-                .enableLogDebug(true)
-                .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE)
-                .backupLocationCustomFile(file)
-                .maxFileCount(5)
-                .apply {
-                    onCompleteListener { success, message, exitCode ->
-                    Log.d("ROOM BACKUP", "success: $success, message: $message, exitCode: $exitCode")
-//                        Toast.makeText(
-//                            context,
-//                            "success: $success, message: $message, exitCode: $exitCode",
-//                            Toast.LENGTH_LONG
-//                        ).show()
-                        if (!success) {
-                            Toast.makeText(
-                                context,
-                                "Backup process was not successful.",
-                                Toast.LENGTH_LONG
-                            ).show()
+    private fun checkFresh() {
+        if(sharedPreferences.getBoolean("fresh", true)){
+            val editor = sharedPreferences.edit()
+            if(GatewayServiceUtil.getBackupFile(this) != null)
+                DialogBottomSheet(
+                    this,
+                    getString(R.string.dialog_restore_title),
+                    getString(R.string.dialog_restore_desc),
+                    getString(R.string.dialog_restore_cancel),
+                    getString(R.string.dialog_restore),
+                    false,
+                    R.color.colorError,
+                    object : DialogBottomSheet.DialogListener {
+                        override fun onGo(isGo: Boolean) {
+                            if (isGo) {
+                                val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+                                intent.putExtra("scroll", "restore")
+                                startActivity(intent)
+                            } else {
+                                editor.putBoolean("fresh", false)
+                                editor.apply()
+                            }
                         }
-                    }
-                }
-                .backup()
-        } catch (e:Exception){
-            Toast.makeText(
-                this,
-                "Error:+ ${e.message}",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-    }
-
-    private fun restoreRoom() {
-        return
-        try {
-            val file = getBackupFile() ?: return
-            backup
-                .database(ContactDatabase.getDatabase(this))
-                .enableLogDebug(true)
-                .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE)
-                .backupLocationCustomFile(file)
-                .apply {
-                    onCompleteListener { success, message, exitCode ->
-                        Log.d("ROOM BACKUP", "success: $success, message: $message, exitCode: $exitCode")
-                        if (success) restartApp(Intent(context, MainActivity::class.java))
-//                        Toast.makeText(
-//                            context,
-//                            "Restore: success: $success, message: $message, exitCode: $exitCode",
-//                            Toast.LENGTH_LONG
-//                        ).show()
-                    }
-                }
-                .restore()
-        } catch (e:Exception) {
-            Toast.makeText(
-                this,
-                "Error:+ ${e.message}",
-                Toast.LENGTH_LONG
-            ).show()
+                    }).show()
         }
     }
 
@@ -888,7 +713,6 @@ class MainActivity : ComponentActivity() {
             old != 0 && new != 0 -> if (override) new else old
             else -> if (new != 0) new else old
         }
-
 
     private fun combineTags(existingTag: String?, newTag: String?): String {
         return when {

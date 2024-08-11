@@ -209,11 +209,6 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
         return error.isNotEmpty()
     }
 
-    fun killBroadcast() {
-        job?.cancel()
-        _status.postValue(KILLED)
-    }
-
     fun abortBroadcast() {
         abort = true
         _status.postValue(ABORTED)

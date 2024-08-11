@@ -6,7 +6,8 @@
     <!-- Preference Titles -->
     <string name="frequency_header">Frequency</string>
     <string name="max_header">Max messages</string>
-    <string name="data_header">Data</string>
+    <string name="contacts_header">Contacts</string>
+    <string name="database_header">Database</string>
 
     <!-- Messages Preferences -->
     <string name="frequency_title">Hot contact duration</string>
@@ -35,9 +36,17 @@
     <string name="live_summary_off">Broadcast messages are sent to test contacts. The sms will fail as the numbers are fake and are used for testing purposes.</string>
     <string name="live_summary_on">Broadcast messages are sent to your actual contacts. Make sure you everything is correct. If you wan to test the app, switch to test mode.</string>
 
-    <!-- Data Preferences -->
+    <!-- Contacts Preferences -->
     <string name="reset_title">Reset contacts list</string>
     <string name="reset_summary">Clear your contact list if your imported data is bad, corrupted or before importing a fresh list of contacts.</string>
+
+    <!-- Database Import Preferences -->
+    <string name="backup_title">Backup database</string>
+    <string name="backup_summary">Save your data in case the data is corrupted, app crashes or is uninstalled to "…/Documents/Qedron gateway/gatewayDB.sqlite3" </string>
+
+    <!-- Database restore Preferences -->
+    <string name="restore_title">Restore database</string>
+    <string name="restore_summary">Import data from previous backups under "…/Documents/Qedron gateway/gatewayDB.sqlite3"</string>
 
     <string name="abort">Abort</string>
     <string name="contacts_available">%1$d/%2$d contacts available for broadcast</string>
