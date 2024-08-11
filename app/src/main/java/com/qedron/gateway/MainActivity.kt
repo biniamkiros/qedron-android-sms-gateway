@@ -1,9 +1,7 @@
 package com.qedron.gateway
 
-import android.Manifest
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.SEND_SMS
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.ClipData
@@ -19,7 +17,6 @@ import android.provider.Settings
 import android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
 import android.util.Log
 import android.view.ContextThemeWrapper
-import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -35,14 +32,12 @@ import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import com.qedron.gateway.databinding.ActivityMainBinding
-import de.raphaelebner.roomdatabasebackup.core.RoomBackup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.io.IOException
 import java.net.Inet4Address
 import java.net.NetworkInterface

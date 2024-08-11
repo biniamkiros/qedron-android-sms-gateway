@@ -154,8 +154,6 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
         dialogSuccessMsg?.text = context.getString(R.string.fetching_result)
         buttonCancel?.setBackgroundColor(ContextCompat.getColor(context, R.color.colorButton))
         dialogInput?.editText?.isEnabled = true
-//        buttonGo?.visibility =
-//            if (dialogInput?.editText?.text.toString().isNotEmpty() && viewModel.error.value?.isEmpty() == true) View.VISIBLE else View.GONE
 
         dialogInput?.error = error.ifEmpty { null }
         if(error.isEmpty()
@@ -177,15 +175,13 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
         dialogInput?.editText?.isEnabled = true
     }
 
-    private fun showBroadcastStart(){
-//        if(viewModel.status.value == BroadcastViewModel.ONGOING) {
-            dialogInput?.clearFocus()
-            dialogInput?.editText?.isEnabled = false
-            buttonGo?.visibility = View.GONE
-            dialogLayoutProgress?.visibility = View.VISIBLE
-            dialogProgressMsg?.text = context.getString(R.string.preparing_for_broadcast)
-            dialogSuccessMsg?.visibility = View.GONE
-//        }
+    private fun showBroadcastStart() {
+        dialogInput?.clearFocus()
+        dialogInput?.editText?.isEnabled = false
+        buttonGo?.visibility = View.GONE
+        dialogLayoutProgress?.visibility = View.VISIBLE
+        dialogProgressMsg?.text = context.getString(R.string.preparing_for_broadcast)
+        dialogSuccessMsg?.visibility = View.GONE
     }
 
     private fun showBroadcastProgress(progress: String){
@@ -243,7 +239,6 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
                 show()
             }
         }
-
     }
 
     private fun showRangeMenu(){
