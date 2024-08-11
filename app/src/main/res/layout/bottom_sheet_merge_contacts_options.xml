@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="56dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="24dp"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/controllerScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:minHeight="56dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="24dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp">
+
+            <View
+                android:id="@+id/handle"
+                android:layout_width="48dp"
+                android:layout_height="4dp"
+                android:background="@drawable/handle"
+                android:alpha="0.4"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/dialogTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/conflict_found_while_importing"
+                android:textColor="@color/colorTextOnSurface"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/handle" />
+
+            <TextView
+                android:id="@+id/dialogDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:text="@string/existing_contacts_found_while_importing_the_new_contacts"
+                android:textColor="@color/colorTextOnSurface"
+                android:alpha="0.6"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dialogTitle" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/nameSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/name"
+                android:layout_marginBottom="12dp"
+                android:textColor="@color/colorTextOnSurface" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/detailSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/details"
+                android:layout_marginBottom="12dp"
+                android:textColor="@color/colorTextOnSurface" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/rankSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ranking"
+                android:layout_marginBottom="12dp"
+                android:textColor="@color/colorTextOnSurface" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tagInput"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/custom_tag"
+                android:layout_marginTop="12dp"
+                app:errorEnabled="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dialogContactCount">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionNext"
+                    android:inputType="textMultiLine"
+                    android:maxLines="10"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/allCheck"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/do_it_for_all"
+                android:textColor="@color/colorTextOnSurface"
+                android:drawableTint="@color/colorAccent"
+                android:buttonTint="@drawable/checkbox_selector"/>
+
+            <LinearLayout
+                android:id="@+id/layoutButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:layout_marginTop="24dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dialogDescription">
+
+                <Button
+                    android:id="@+id/buttonCancel"
+                    android:layout_width="0dp"
+                    android:layout_weight="5"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:backgroundTint="@color/colorTextOnSurface"
+                    android:textColor="@color/colorSurface"
+                    android:text="@string/dialog_action_negative"
+                    tools:ignore="ButtonStyle" />
+
+                <Button
+                    android:id="@+id/buttonGo"
+                    android:layout_width="0dp"
+                    android:layout_weight="5"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:textColor="@color/colorTextOnPrimary"
+                    android:text="@string/dialog_action_positive"
+                    tools:ignore="ButtonStyle" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

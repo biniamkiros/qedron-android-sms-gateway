@@ -28,9 +28,11 @@
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
         <item name="android:navigationBarDividerColor" tools:targetApi="o_mr1">@color/colorSurfaceLight</item>
 
+        <!-- Add your custom AlertDialog style -->
+        <item name="alertDialogTheme">@style/AlertDialogCustom</item>
     </style>
 
-    <style name="SettingTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="FlatTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorSecondary">@color/colorSurface</item>
@@ -54,8 +56,12 @@
         <item name="android:windowBackground">@color/colorBackground</item>
         <item name="android:windowActivityTransitions" >true</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
-        <item name="android:navigationBarDividerColor" tools:targetApi="o_mr1">@color/colorBackground</item>
-
+        <item name="actionBarStyle">@style/SmallActionBar</item>
+        <item name="android:navigationBarDividerColor" tools:targetApi="o_mr1">#00000000</item>
+<!--        <item name="toolbarStyle">@style/Widget.Toolbar</item>-->
+<!--        <item name="android:actionBarStyle">@style/FlatActionBarStyle</item>-->
+<!--<item name="android:titleTextStyle">@style/toolbarTitleStyle</item>-->
+<!--        <item name="android:subtitleTextStyle">@style/toolbarTitleStyle</item>-->
     </style>
 
     <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
@@ -65,10 +71,23 @@
         <item name="android:textColorPrimary">@color/colorPrimary</item>
         <!-- Used for the background -->
         <item name="android:background">@color/colorSurfaceLight</item>
+
+        <!-- Used for the buttons -->
+        <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButton</item>
+    </style>
+
+    <style name="AlertDialogButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/colorAccent</item>
     </style>
 
     <style name="AppTheme.PreviewFix" parent="AppTheme">
         <item name="buttonStyle">@style/AppTheme.Button.PreviewFix</item>
+    </style>
+
+    <style name="FlatTheme.PopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:textColor">@color/colorTextOnSurface</item>
+        <item name="android:itemBackground">@color/colorSurfaceLight</item>
     </style>
 
     <style name="AppTheme.Button" parent="Widget.MaterialComponents.Button">
@@ -85,6 +104,13 @@
 
     <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/colorBackground</item>
+    </style>
+    <style name="FlatActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:titleTextStyle">@style/Theme.MaterialComponents.DayNight.ActionBar.TitleTextStyle</item>
+        <item name="android:subtitleTextStyle">@style/Theme.MaterialComponents.DayNight.ActionBar.TitleTextStyle</item>
+    </style>
+    <style name="Theme.MaterialComponents.DayNight.ActionBar.TitleTextStyle" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">12sp</item>
     </style>
 
     <!--    custom styles-->
@@ -202,7 +228,7 @@
         <item name="android:gravity">center</item>
         <item name="android:textAlignment">center</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">12sp</item>
         <!--        <item name="titleTextAppearance">@style/RobotoToolBarTitleStyle</item>-->
         <!--        <item name="subtitleTextAppearance">@style/RobotoToolBarSubtitleStyle</item>-->
     </style>
@@ -219,6 +245,21 @@
         <item name="android:shadowDy">1</item>
         <item name="android:shadowRadius">2</item>
 <!--        <item name="android:fontFamily">@font/plate</item>-->
+    </style>
+
+
+    <!--contact list-->
+    <style name="SmallActionBar" parent="Widget.AppCompat.ActionBar.Solid">
+        <item name="titleTextStyle">@style/SmallActionBarTitleText</item>
+        <item name="subtitleTextStyle">@style/SmallActionBarSubtitleText</item>
+    </style>
+
+    <style name="SmallActionBarTitleText" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="SmallActionBarSubtitleText" parent="TextAppearance.AppCompat.Widget.ActionBar.Subtitle">
+        <item name="android:textSize">14sp</item>
     </style>
 
 </resources>

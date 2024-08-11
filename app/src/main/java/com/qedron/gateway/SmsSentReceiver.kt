@@ -13,13 +13,11 @@ class SmsSentReceiver : BroadcastReceiver() {
         when (resultCode) {
             Activity.RESULT_OK -> {
                 Log.d(tag, "SMS sent")
-                GatewayServiceUtil.increment(context, GatewayServiceUtil.COUNT)
                 GatewayServiceUtil.increment(context, GatewayServiceUtil.SENT)
                 GatewayServiceUtil.notifyStat(context)
             }
             SmsManager.RESULT_ERROR_GENERIC_FAILURE -> {
                 Log.d(tag,   "Generic failure")
-                GatewayServiceUtil.increment(context, GatewayServiceUtil.COUNT)
                 GatewayServiceUtil.increment(context,
                     GatewayServiceUtil.FAILED
                 )
@@ -28,7 +26,6 @@ class SmsSentReceiver : BroadcastReceiver() {
             }
             SmsManager.RESULT_ERROR_NO_SERVICE -> {
                 Log.d(tag, "No service")
-                GatewayServiceUtil.increment(context, GatewayServiceUtil.COUNT)
                 GatewayServiceUtil.increment(context,
                     GatewayServiceUtil.FAILED
                 )
@@ -37,7 +34,6 @@ class SmsSentReceiver : BroadcastReceiver() {
             }
             SmsManager.RESULT_ERROR_NULL_PDU -> {
                 Log.d(tag, "Null PDU")
-                GatewayServiceUtil.increment(context, GatewayServiceUtil.COUNT)
                 GatewayServiceUtil.increment(context,
                     GatewayServiceUtil.FAILED
                 )
@@ -46,7 +42,6 @@ class SmsSentReceiver : BroadcastReceiver() {
             }
             SmsManager.RESULT_ERROR_RADIO_OFF -> {
                 Log.d(tag, "Radio off")
-                GatewayServiceUtil.increment(context, GatewayServiceUtil.COUNT)
                 GatewayServiceUtil.increment(context,
                     GatewayServiceUtil.FAILED
                 )

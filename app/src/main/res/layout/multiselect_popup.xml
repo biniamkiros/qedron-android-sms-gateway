@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_tags"
+        android:textSize="18sp"
+        android:textColor="@color/colorTextOnSurface"
+        android:padding="12dp" />
+
+    <ListView
+        android:id="@+id/tagList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:choiceMode="multipleChoice"
+        android:dividerHeight="1dp" />
+<!--    android:divider="@color/dividerColor"-->
+
+</LinearLayout>

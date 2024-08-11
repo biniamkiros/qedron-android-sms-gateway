@@ -1,35 +1,33 @@
 package com.qedron.gateway
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.ListView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.slider.RangeSlider
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.Calendar
 
-class BroadcastBottomSheet(context: Context) : BottomSheetDialog(context) {
+class BroadcastBottomSheet(context: Context, private val dialogListener: DialogListener, private val viewModel: BroadcastViewModel) : BottomSheetDialog(context){
 
-    private lateinit var contacts: List<Contact>
-    private var count: Int=0
-    private var isSent = false
-    private var limit = false
-    private var frequency = -7
-    private var max = 100
-    private var top = -1
+    private var modeTxt: TextView? = null
     private var dialogTitle: TextView? = null
     private var dialogDescription: TextView? = null
     private var dialogContactCount: TextView? = null
+    private var tagsBtn: Button? = null
+    private var rangeBtn: Button? = null
     private var dialogLayoutProgress: LinearLayout? = null
     private var dialogProgressMsg: TextView? = null
     private var dialogSuccessMsg : TextView? = null
@@ -37,8 +35,9 @@ class BroadcastBottomSheet(context: Context) : BottomSheetDialog(context) {
     private var buttonCancel: Button? = null
     private var dialogInput: TextInputLayout? = null
 
-    private val scope = CoroutineScope(Job() + Dispatchers.Main)
-    private val dbHelper = DatabaseHelperImpl(ContactDatabase.getDatabase(context))
+    interface DialogListener{
+        fun onBroadcastComplete(isGo:Boolean)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,104 +48,240 @@ class BroadcastBottomSheet(context: Context) : BottomSheetDialog(context) {
 
         dialogTitle = findViewById(R.id.dialogTitle)
         dialogDescription = findViewById(R.id.dialogDescription)
+        tagsBtn = findViewById(R.id.tagsBtn)
+        rangeBtn = findViewById(R.id.rangeBtn)
         dialogContactCount  = findViewById(R.id.dialogContactCount)
         dialogLayoutProgress = findViewById(R.id.dialogLayoutProgress)
         dialogProgressMsg = findViewById(R.id.dialogProgressMsg)
-
         dialogSuccessMsg = findViewById(R.id.dialogSuccessMsg)
-
         buttonGo = findViewById(R.id.buttonGo)
         buttonCancel = findViewById(R.id.buttonCancel)
         dialogInput = findViewById(R.id.dialogInput)
+        modeTxt = findViewById(R.id.modeTxt)
 
+        handleStatusChange(viewModel.status.value)
+
+        dialogInput?.editText?.setText(viewModel.broadcastMessage)
         dialogInput?.editText?.doAfterTextChanged {
-            if(isSent){
-                initBroadCast()
-            }
-            buttonGo?.visibility = if(it.toString().isNotEmpty()) View.VISIBLE else View.GONE
-
+            viewModel.isMessageModified = true
+            viewModel.broadcastMessage = it.toString()
         }
 
+        tagsBtn?.setOnClickListener { showTagsMenu() }
+        rangeBtn?.setOnClickListener { showRangeMenu() }
+        buttonGo?.setOnClickListener { startBroadcast() }
+        buttonCancel?.setOnClickListener { handleCancel() }
 
-        buttonGo?.setOnClickListener {
-            val message = dialogInput?.editText?.text.toString()
-            if(message.isNotEmpty()) broadCast(message)
-        }
-
-        buttonCancel?.setOnClickListener {
-            dismiss()
-        }
-
-        initBroadCast()
+        viewModel.progress.observe(this) { showBroadcastProgress(it) }
+        viewModel.status.observe(this) { handleStatusChange(it) }
+        viewModel.error.observe(this){ showBroadcastReady() }
 
     }
 
-    private fun initBroadCast() {
-        scope.launch {
-            withContext(Dispatchers.IO) {
-                val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-                count = dbHelper.countContacts()
+    private fun handleStatusChange(status: String?) {
+        when (status) {
+            BroadcastViewModel.STARTED -> initiateBroadcast()
+            BroadcastViewModel.INITIATED -> showBroadcastReady()
+            BroadcastViewModel.ONGOING -> showBroadcastStart()
+            BroadcastViewModel.ABORTED,
+            BroadcastViewModel.KILLED,
+            BroadcastViewModel.CLEARED,
+            BroadcastViewModel.COMPLETED -> showBroadcastDone()
+        }
+    }
 
-                limit = preferences.getBoolean("limit", false)
-                frequency =  preferences.getString("frequency", "7")!!.toInt() * -1
-                max = preferences.getString("max", "100")!!.toInt()
-                top = preferences.getString("bulk", "-1")!!.toInt()
+    private fun handleCancel(){
+        when(viewModel.status.value){
+            BroadcastViewModel.ABORTED,
+            BroadcastViewModel.COMPLETED,
+            BroadcastViewModel.INITIATED -> {
+                dismiss()
+                viewModel.finishBroadcast()
+                dialogListener.onBroadcastComplete(true)
+            }
+            BroadcastViewModel.ONGOING -> viewModel.abortBroadcast()
+        }
+    }
 
-                contacts =if(limit) dbHelper.getFreshLimitedContacts(frequency, max, if(top>0) top else count)
-                else dbHelper.getFreshContacts(frequency)
+    private fun initiateBroadcast() {
+        viewModel.initBroadCast()
+        viewModel.isMessageModified = false
+    }
 
-                withContext(Dispatchers.Main) {
-                    dialogContactCount?.text =
-                        context.getString(R.string.contacts_available, contacts.size, count)
-                    buttonCancel?.text = context.getString(R.string.abort)
-                    dialogSuccessMsg?.visibility = View.GONE
-                    dialogSuccessMsg?.text = context.getString(R.string.fetching_result)
-                    buttonCancel?.setBackgroundColor(ContextCompat.getColor(context,R.color.colorButton))
+    private fun startBroadcast() {
+        val intent = Intent(context, BroadcastService::class.java)
+        val running = GatewayServiceUtil.isBroadcastRunning(context)
+        if (!running) {
+            ContextCompat.startForegroundService(context, intent)
+        }
+        showBroadcastInitialised()
+        viewModel.startBroadCast()
+    }
 
+    private fun showBroadcastReady() {
+        if (viewModel.status.value == BroadcastViewModel.ABORTED
+            || viewModel.status.value == BroadcastViewModel.COMPLETED)
+            return
+        val error = viewModel.error.value?:""
+        val tags = viewModel.tags
+        val selectedTags = viewModel.selectedTags
+            dialogContactCount?.text =
+                context.getString(R.string.contacts_available, viewModel.contacts.size, viewModel.count)
+        tagsBtn?.text = if (viewModel.selectedTags.isEmpty() || tags.sorted() == selectedTags.sorted()) {
+            "all tags"
+        } else {
+            selectedTags.joinToString(", ") { it.ifEmpty { "untagged" } }
+                .let {
+                    if (it.length > 14) it.take(20) + "..." else it
                 }
-            }
+        }
+
+        rangeBtn?.text = viewModel.selectedMinMaxRanking.let { if(it.minRanking < it.maxRanking) "$${it.minRanking} - $${it.maxRanking}" else "full range" }
+         if(viewModel.isLive) {
+             modeTxt?.text = context.getString(R.string.live)
+             modeTxt?.setTextColor(context.getColor(R.color.colorLive))
+             modeTxt?.background =  AppCompatResources.getDrawable(context,R.drawable.live_text_background)
+         } else {
+             modeTxt?.text = context.getString(R.string.test)
+             modeTxt?.setTextColor(context.getColor(R.color.colorTest))
+             modeTxt?.background = AppCompatResources.getDrawable(context,R.drawable.test_text_background)
+         }
+        buttonCancel?.text = context.getString(R.string.abort)
+        dialogSuccessMsg?.visibility = View.GONE
+        dialogSuccessMsg?.text = context.getString(R.string.fetching_result)
+        buttonCancel?.setBackgroundColor(ContextCompat.getColor(context, R.color.colorButton))
+        dialogInput?.editText?.isEnabled = true
+//        buttonGo?.visibility =
+//            if (dialogInput?.editText?.text.toString().isNotEmpty() && viewModel.error.value?.isEmpty() == true) View.VISIBLE else View.GONE
+
+        dialogInput?.error = error.ifEmpty { null }
+        if(error.isEmpty()
+            && viewModel.broadcastMessage.isNotEmpty()
+            && viewModel.status.value == BroadcastViewModel.INITIATED) {
+            buttonGo?.visibility = View.VISIBLE
+        } else {
+            buttonGo?.visibility = View.GONE
+            dialogLayoutProgress?.visibility = View.GONE
         }
     }
 
-    private fun broadCast(message:String) {
-        scope.launch {
-            buttonGo?.visibility = View.GONE
+    private fun showBroadcastInitialised() {
+        buttonGo?.visibility = View.GONE
+        dialogInput?.clearFocus()
+        dialogLayoutProgress?.visibility = View.VISIBLE
+        dialogProgressMsg?.text = context.getString(R.string.preparing_for_broadcast)
+        dialogSuccessMsg?.visibility = View.GONE
+        dialogInput?.editText?.isEnabled = true
+    }
+
+    private fun showBroadcastStart(){
+//        if(viewModel.status.value == BroadcastViewModel.ONGOING) {
             dialogInput?.clearFocus()
+            dialogInput?.editText?.isEnabled = false
+            buttonGo?.visibility = View.GONE
             dialogLayoutProgress?.visibility = View.VISIBLE
             dialogProgressMsg?.text = context.getString(R.string.preparing_for_broadcast)
-            withContext(Dispatchers.IO) {
-                var sent = 0
-                contacts.forEachIndexed { index, contact ->
-                    val success = GatewayServiceUtil.sendMessage(context, contact.phoneNumber, message)
-                    if(success) {
-                        sent++
-                        val now = Calendar.getInstance().time
-                        contact.lastContact = now
-                        dbHelper.updateContact(contact)
-                        dbHelper.insertMessage(Message(contactId = contact.id, message = message, timeStamp = now)
-                        )
-                    }
-                    withContext(Dispatchers.Main) {
-                        val progress = "${index + 1}/${contacts.size} sending to ${if (contact.name.isNullOrEmpty()) contact.phoneNumber else "${contact.name} - ${contact.phoneNumber}"}"
-                        dialogProgressMsg?.text = progress
-                    }
-                }
-                withContext(Dispatchers.Main){
-                    isSent =true
-                    buttonCancel?.text = context.getString(R.string.done)
-                    buttonCancel?.setBackgroundColor(ContextCompat.getColor(context,R.color.colorSuccess))
-                    dialogSuccessMsg?.visibility = View.VISIBLE
-                    dialogSuccessMsg?.text = context.getString(
-                        R.string.broadcast_sent_to_available_contacts,
-                        sent,
-                        contacts.size
-                    )
-                    dialogProgressMsg?.text = context.getString(R.string.preparing_for_broadcast)
-                    dialogLayoutProgress?.visibility = View.GONE
-                    GatewayServiceUtil.notifyStat(context)
-                }
-            }
-        }
+            dialogSuccessMsg?.visibility = View.GONE
+//        }
     }
 
+    private fun showBroadcastProgress(progress: String){
+        dialogProgressMsg?.text = progress
+        dialogLayoutProgress?.visibility = if (viewModel.status.value == BroadcastViewModel.ONGOING) View.VISIBLE else View.GONE
+    }
+
+    private fun showBroadcastDone() {
+        buttonCancel?.text = context.getString(R.string.done)
+        dialogSuccessMsg?.visibility = View.VISIBLE
+        dialogSuccessMsg?.text =
+                context.getString(
+                    R.string.broadcast_sent_to_available_contacts,
+                    viewModel.status.value,
+                    viewModel.sent,
+                    viewModel.contacts.size
+                )
+        dialogProgressMsg?.text = context.getString(R.string.preparing_for_broadcast)
+        dialogLayoutProgress?.visibility = View.GONE
+        buttonGo?.visibility = View.GONE
+        dialogInput?.editText?.isEnabled = true
+        GatewayServiceUtil.notifyStat(context)
+    }
+
+    private fun showTagsMenu() {
+        if (viewModel.tags.isEmpty()) {
+            Toast.makeText(context, "no tags found.", Toast.LENGTH_LONG).show()
+        } else {
+            val dialogView = layoutInflater.inflate(R.layout.multiselect_popup, null)
+            val listView: ListView = dialogView.findViewById(R.id.tagList)
+            val adapter = ArrayAdapter(context, android.R.layout.simple_list_item_multiple_choice, viewModel.tags.map { it.ifEmpty { "untagged" } })
+            listView.adapter = adapter
+
+            for (i in viewModel.tags.indices) {
+                listView.setItemChecked(i, viewModel.selectedTags.contains(viewModel.tags[i]))
+            }
+
+            AlertDialog.Builder(context, R.style.AlertDialogCustom).apply {
+                setView(dialogView)
+                setPositiveButton("OK") { dialog, _ ->
+                    val selectedItems = mutableListOf<String>()
+                    for (i in viewModel.tags.indices) {
+                        if (listView.isItemChecked(i)) {
+                            selectedItems.add(viewModel.tags[i])
+                        }
+                    }
+                    with(PreferenceManager.getDefaultSharedPreferences(context).edit()) {
+                        putStringSet("tags", selectedItems.filter { it.isNotEmpty() }.toSet())
+                        apply()
+                    }
+                    viewModel.initBroadCast()
+                    dialog.dismiss()
+                }
+                create()
+                show()
+            }
+        }
+
+    }
+
+    private fun showRangeMenu(){
+        if (viewModel.minMaxRanking.minRanking < viewModel.minMaxRanking.maxRanking) {
+            val dialogView = layoutInflater.inflate(R.layout.dialog_number_range_slider, null)
+            val rangeSlider = dialogView.findViewById<RangeSlider>(R.id.rangeSlider)
+
+            try {
+                val from = viewModel.minMaxRanking.minRanking.toFloat() ?: 0f
+                val to = viewModel.minMaxRanking.maxRanking.toFloat() ?: 100f
+
+                val min = viewModel.selectedMinMaxRanking.minRanking.toFloat() ?: from
+                val max = viewModel.selectedMinMaxRanking.maxRanking.toFloat() ?: to
+
+                if (min >= from && max <= to) {
+                    rangeSlider.valueFrom = from
+                    rangeSlider.valueTo = to
+                    rangeSlider.values = listOf(min, max)
+
+                    AlertDialog.Builder(context, R.style.AlertDialogCustom)
+                        .setTitle("Select ranking range")
+                        .setView(dialogView)
+                        .setPositiveButton("OK") { dialog, _ ->
+                            with(PreferenceManager.getDefaultSharedPreferences(context).edit()) {
+                                putInt("minRank", rangeSlider.values[0].toInt())
+                                putInt("maxRank", rangeSlider.values[1].toInt())
+                                apply()
+                            }
+                            viewModel.initBroadCast()
+                            dialog.dismiss()
+                        }
+                        .create()
+                        .show()
+                } else {
+                    Log.e("RangeSlider", "Selected values are out of bounds min:$min >= from:$from max:$max <= to:$to")
+                }
+            } catch (e: Exception) {
+                Log.e("RangeSlider", "Error setting up RangeSlider", e)
+            }
+        } else {
+            Toast.makeText(context, "no ranking difference found.", Toast.LENGTH_LONG).show()
+        }
+    }
 }

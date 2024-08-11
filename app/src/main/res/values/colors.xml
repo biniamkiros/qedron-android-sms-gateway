@@ -15,6 +15,7 @@
     <color name="colorBackground">#111E24</color>
     <color name="colorSurface">#223036</color>
     <color name="colorSurfaceLight">#2B383E</color>
+    <color name="colorMessage">#34434A</color>
     <color name="colorPolyline">#FFC107</color>
     <color name="colorYesterdayPolyline">#f27602</color>
     <color name="colorOldPolyline">#d1d1cf</color>
@@ -25,6 +26,8 @@
     <color name="colorSurfaceLightScrimLight">#C3000000</color>
     <color name="colorError">#CF6679</color>
     <color name="colorAttention">#F44336</color>
+    <color name="colorLive">#F6564B</color>
+    <color name="colorTest">#A3A2A2</color>
     <color name="colorSuccess">#09AFB5</color>
     <color name="colorButton">#E1E1E1</color>
     <color name="colorGreen">#66CA8E</color>

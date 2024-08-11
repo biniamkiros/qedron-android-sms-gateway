@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/by_tag"
+        android:id="@+id/sort_by_tag" />
+    <item android:title="@string/by_name"
+        android:id="@+id/sort_by_name" />
+    <item android:title="@string/by_status"
+        android:id="@+id/sort_by_status" />
+    <item android:title="@string/by_ranking"
+        android:id="@+id/sort_by_rank" />
+    <item android:title="@string/by_details"
+        android:id="@+id/sort_by_details" />
+    <item android:title="@string/by_phone_number"
+        android:id="@+id/sort_by_phone" />
+    <item android:title="@string/by_message_count"
+        android:id="@+id/sort_by_messages" />
+    <item android:title="@string/by_last_contact_date"
+        android:id="@+id/sort_by_last_contact" />
+
+</menu>

@@ -14,9 +14,14 @@ import java.util.Date
 data class Contact(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val name: String?,
-    val phoneNumber: String,
-    var lastContact: Date?
+    var name: String = "",
+    var details: String = "",
+    var phoneNumber: String,
+    var tag: String = "",
+    var ranking: Int = 0,
+    var lastContact: Date? = null,
+    var blocked: Boolean = false,
+    val isTest:Boolean = false
 )
 
 @Entity(
@@ -36,12 +41,18 @@ data class Message(
     val message:String,
     val timeStamp: Date)
 
-
 data class ContactWithMessages(
-    @Embedded val contact: Contact,
+    @Embedded var contact: Contact,
     @Relation(
         parentColumn = "id",
         entityColumn = "contactId"
     )
-    val messages: List<Message>
+    val messages: List<Message>,
+    val messageCount: Int
 )
+
+data class MinMaxRanking(
+    val minRanking: Int,
+    val maxRanking: Int
+)
+

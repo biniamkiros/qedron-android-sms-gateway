@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.qedron.gateway.ui.main.TimeRangePickerDialogFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -89,6 +90,32 @@ class SettingsActivity : AppCompatActivity() {
                         }).show()
                 }
                 return@setOnPreferenceClickListener true
+            }
+            findPreference<Preference>("time_range")?.setOnPreferenceClickListener {
+                val dialog = TimeRangePickerDialogFragment()
+                dialog.show(parentFragmentManager, "TimeRangePickerDialog")
+                true
+            }
+
+            findPreference<Preference>("seed")?.setOnPreferenceClickListener {
+                scope.launch {
+                    withContext(Dispatchers.IO) {
+                        context?.let { it1 ->
+                            val dbHelper =
+                                DatabaseHelperImpl(ContactDatabase.getDatabase(it1))
+                            dbHelper.deleteAllContacts()
+                            dbHelper.insertAll(GatewayServiceUtil.generateTestContacts(it1))
+
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(
+                                    it1,"Generated 1000 test contacts",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    }
+                }
+                true
             }
         }
     }

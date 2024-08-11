@@ -7,11 +7,8 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
-import android.preference.PreferenceManager
-import android.telephony.SmsManager
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import java.util.ArrayList
+import androidx.preference.PreferenceManager
 
 class GatewayService : Service(), GatewayServer.Handler {
 
@@ -51,9 +48,7 @@ class GatewayService : Service(), GatewayServer.Handler {
     }
 
     override fun onCreate() {
-        val key = PreferenceManager
-            .getDefaultSharedPreferences(this)
-            .getString(PREFERENCE_KEY, null)
+        val key = PreferenceManager.getDefaultSharedPreferences(this).getString(PREFERENCE_KEY, null)
         gatewayServer = GatewayServer(DEFAULT_PORT, key, this)
     }
 
@@ -76,23 +71,13 @@ class GatewayService : Service(), GatewayServer.Handler {
     }
 
     override fun onSendMessage(phone: String, message: String, saveMessage: Boolean): String? {
-        return try {
-            val sms = this.getSystemService(SmsManager::class.java)
-            val parts: ArrayList<String> = sms.divideMessage(message)
-            sms.sendMultipartTextMessage(
-                phone,
-                null,
-                parts,
-                null,
-                null
-            )
-
-            Toast.makeText(this, "Sending sms..", Toast.LENGTH_LONG).show()
-            null
-        } catch (e: Exception) {
-            Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
-            e.message
-        }
+        GatewayServiceUtil.sendMessage(
+            this,
+            GatewayServiceUtil.getSmsManager(this),
+            phone,
+            message
+        )
+        return null
     }
 
 }

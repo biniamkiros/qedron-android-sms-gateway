@@ -18,6 +18,35 @@
         <item>30</item>
     </string-array>
 
+    <!-- Delay Preference -->
+    <string-array name="delay_entries">
+        <item>none</item>
+        <item>100 millisecond</item>
+        <item>half a second</item>
+        <item>a second</item>
+        <item>3 seconds</item>
+        <item>5 seconds</item>
+        <item>7 seconds</item>
+        <item>10 seconds</item>
+        <item>12 seconds</item>
+        <item>30 seconds</item>
+        <item>a minute</item>
+    </string-array>
+
+    <string-array name="delay_values">
+        <item>0</item>
+        <item>100</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>3000</item>
+        <item>5000</item>
+        <item>7000</item>
+        <item>10000</item>
+        <item>12000</item>
+        <item>30000</item>
+        <item>60000</item>
+    </string-array>
+
     <!-- Max Preference -->
     <string-array name="max_entries">
         <item>10 messages</item>
@@ -39,6 +68,8 @@
 
     <!-- Bulk Preference -->
     <string-array name="bulk_entries">
+        <item>10 messages</item>
+        <item>50 messages</item>
         <item>100 messages</item>
         <item>500 messages</item>
         <item>1,000 messages</item>
@@ -48,7 +79,8 @@
     </string-array>
 
     <string-array name="bulk_values">
-        <item>100</item>
+        <item>10</item>
+        <item>50</item>
         <item>500</item>
         <item>1000</item>
         <item>5000</item>

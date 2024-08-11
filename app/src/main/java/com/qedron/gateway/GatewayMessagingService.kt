@@ -11,7 +11,10 @@ class GatewayMessagingService : FirebaseMessagingService() {
         val phone = remoteMessage.data["phone"]
         val message = remoteMessage.data["message"]
         if (phone != null && message != null) {
-            GatewayServiceUtil.sendMessage(this, phone, message)
+            GatewayServiceUtil.sendMessage(this,
+                GatewayServiceUtil.getSmsManager(this),
+                phone,
+                message)
         }
     }
 

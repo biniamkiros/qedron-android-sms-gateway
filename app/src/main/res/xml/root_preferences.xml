@@ -10,6 +10,19 @@
             app:title="@string/frequency_title"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            app:defaultValue="1000"
+            app:entries="@array/delay_entries"
+            app:entryValues="@array/delay_values"
+            app:key="delay"
+            app:title="@string/delay_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <Preference
+            app:key="time_range"
+            app:title="Set broadcast time"
+            app:summary="Prevent sending sms messages in an inconvenient time." />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/max_header">
@@ -41,6 +54,24 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/data_header">
+
+        <SwitchPreferenceCompat
+            app:key="live"
+            app:defaultValue="false"
+            app:title="@string/live_title"
+            app:summaryOff="@string/live_summary_off"
+            app:summaryOn="@string/live_summary_on"/>
+
+        <EditTextPreference
+            app:key="test_prefix"
+            app:defaultValue="987"
+            app:title="@string/prefix_title"
+            app:summary="@string/prefix_summary"
+            />
+
+        <Preference app:key="seed"
+            app:title="@string/seed_title"
+            app:summary="@string/seed_summary"/>
 
         <Preference
             app:key="reset"

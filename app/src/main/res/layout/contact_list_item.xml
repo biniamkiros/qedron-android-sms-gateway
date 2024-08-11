@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/contactContainer"
+    android:clickable="true"
+    android:focusable="true"
+    android:layout_marginStart="24dp"
+    android:layout_marginEnd="24dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:padding="10dp"
+    android:background="@drawable/list_item_background"
+    tools:context=".ContactsActivity">
+    <!--    android:background="?selectableItemBackground"-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="10">
+
+        <TextView
+            android:id="@+id/nameTxt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:hint="@string/loading"
+            android:gravity="start"
+            android:textSize="12sp"
+            android:textColor="@color/colorTextOnSurfaceAlpha"
+            android:layout_gravity="center"
+            android:padding="4dp"
+            />
+
+        <TextView
+            android:id="@+id/smsStatTxt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="6"
+            android:hint="@string/loading"
+            android:gravity="end"
+            android:padding="4dp"
+            android:textSize="12sp"
+            android:layout_marginEnd="4dp"
+            android:alpha="0.6"
+            android:textColor="@color/colorTextOnSurfaceAlpha"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="10"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/numberTxt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:hint="@string/loading"
+            android:padding="4dp"
+            android:textSize="18sp"
+            android:textColor="@color/colorTextOnSurface" />
+
+        <TextView
+            android:id="@+id/rankTxt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:hint="@string/loading"
+            android:padding="4dp"
+            android:gravity="end"
+            android:textSize="12sp"
+            android:textColor="@color/colorSuccess"
+            android:alpha="0.6"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical"
+            android:gravity="end">
+
+            <ImageButton
+                android:id="@+id/blockedBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:padding="4dp"
+                android:src="@drawable/ic_active_24"
+                android:background="?android:selectableItemBackgroundBorderless"
+                android:contentDescription="@string/toggle_active_block_state" />
+<!--                android:src="@drawable/ic_ban_tool_24"-->
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

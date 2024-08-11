@@ -68,6 +68,9 @@ dependencies {
     implementation(libs.javax.servlet)
     implementation(libs.jetty.server)
 
+    // time range picker
+    implementation(libs.timerangepicker)
+
     // Import the Firebase BoM
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
@@ -78,11 +81,18 @@ dependencies {
     implementation(libs.kotlin.csv.jvm) // for JVM platform
 //    implementation(libs.kotlin-csv.js) // for Kotlin JS platform
 
+    // Room backup
+    implementation(libs.roomdatabasebackup)
+
     // Room sqlite db
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.preference)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.lifecycle.service)
     ksp (libs.room.compiler)
 
     testImplementation(libs.junit)
