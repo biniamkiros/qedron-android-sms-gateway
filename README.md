@@ -2,13 +2,13 @@
 
 Turn your phone into an sms gateway
 
-<img src="https://github.com/user-attachments/assets/d9d1dd67-f670-4784-bb8e-f3c2d7394d7b" height="500">
+<img src="https://github.com/user-attachments/assets/d9d1dd67-f670-4784-bb8e-f3c2d7394d7b" height="400">
     
-<img src="https://github.com/user-attachments/assets/92c9e024-4210-4c74-a335-4acb5336b531" height="500">
+<img src="https://github.com/user-attachments/assets/92c9e024-4210-4c74-a335-4acb5336b531" height="400">
 
-<img src="https://github.com/user-attachments/assets/d507aff8-c141-4b95-a4a4-3c1ccad83db1" height="500">
+<img src="https://github.com/user-attachments/assets/d507aff8-c141-4b95-a4a4-3c1ccad83db1" height="400">
 
-<img src="https://github.com/user-attachments/assets/b05dca43-1bcb-4c16-b5ce-2a63bea32e7f" height="500">
+<img src="https://github.com/user-attachments/assets/b05dca43-1bcb-4c16-b5ce-2a63bea32e7f" height="400">
 
 
 
