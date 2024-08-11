@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelStore
 import com.qedron.gateway.BroadcastViewModel.Companion.ABORTED
 import com.qedron.gateway.BroadcastViewModel.Companion.CLEARED
 import com.qedron.gateway.BroadcastViewModel.Companion.COMPLETED
+import com.qedron.gateway.BroadcastViewModel.Companion.INITIATED
 import com.qedron.gateway.BroadcastViewModel.Companion.KILLED
 import com.qedron.gateway.BroadcastViewModel.Companion.ONGOING
 import com.qedron.gateway.BroadcastViewModel.Companion.STARTED
@@ -50,10 +51,11 @@ class BroadcastService() : LifecycleService() {
         }
         viewModel.status.observe(this) { status ->
             when(status){
-                STARTED ->  updateNotification("Preparing for broadcast...")
                 ONGOING -> updateNotification("Starting broadcast...")
-                ABORTED,
+                INITIATED,
+                STARTED,
                 KILLED,
+                ABORTED,
                 CLEARED,
                 COMPLETED -> stopService()
                 else -> stopService()
@@ -74,9 +76,8 @@ class BroadcastService() : LifecycleService() {
             val channel = NotificationChannel(
                 BROADCAST_CHANNEL_ID,
                 BROADCAST_CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_LOW
             )
-//            channel.lockscreenVisibility = Notification.VISIBILITY_SECRET
             notificationManager.createNotificationChannel(channel)
         }
 
@@ -108,6 +109,7 @@ class BroadcastService() : LifecycleService() {
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setContentText(text)
             .setContentIntent(pendingIntent)
+            .setSound(null)
             .addAction(
                 R.drawable.ic_clear_all_24, "abort",
                 clearPendingIntent

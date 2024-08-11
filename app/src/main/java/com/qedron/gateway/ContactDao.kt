@@ -68,12 +68,12 @@ interface ContactDao {
     @Query(
         """
     SELECT * FROM contacts 
-    WHERE (lastContact <= date('now', :days || ' day') OR lastContact IS NULL)
+    WHERE (lastContact <= date('now', :days || ' day') OR lastContact IS NULL) AND isTest = :isTest 
     AND (id IN (
         SELECT contactId 
         FROM messages 
         GROUP BY contactId 
-        HAVING COUNT(id) < :maxMsg
+        HAVING COUNT(id) < :maxMsg OR :maxMsg = -1
     ) 
     OR id NOT IN (
         SELECT contactId 
@@ -92,7 +92,8 @@ interface ContactDao {
         tags: List<String> = emptyList(),
         tagsSize: Int = tags.size,
         minRank: Int = 0,
-        maxRank: Int = Int.MAX_VALUE
+        maxRank: Int = Int.MAX_VALUE,
+        isTest: Boolean
     ): List<Contact>
 
     @Query(

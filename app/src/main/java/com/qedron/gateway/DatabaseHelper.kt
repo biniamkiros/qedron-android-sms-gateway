@@ -19,7 +19,8 @@ interface DatabaseHelper {
         tags: List<String> = emptyList(),
         tagsSize: Int = tags.size,
         minRank: Int = 0,
-        maxRank: Int = Int.MAX_VALUE
+        maxRank: Int = Int.MAX_VALUE,
+        isTest: Boolean
     ): List<Contact>
 
     suspend fun getFreshLimitedTopContacts(days:Int, maxMsg:Int, limit:Int): List<Contact>

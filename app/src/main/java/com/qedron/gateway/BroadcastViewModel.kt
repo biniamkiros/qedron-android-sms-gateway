@@ -1,6 +1,7 @@
 package com.qedron.gateway
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -118,17 +119,24 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
                 carrierLimit = preferences.getString("delay", "1000")!!.toLong()
                 lifeTimeLimit = preferences.getBoolean("limit", false)
                 val minRank = preferences.getInt("minRank", minMaxRanking.minRanking)
-                val maxRank = preferences.getInt("maxRank", minMaxRanking.minRanking)
-                selectedMinMaxRanking = MinMaxRanking(if(minRank > minMaxRanking.minRanking) minRank else minMaxRanking.minRanking, if (maxRank < minMaxRanking.maxRanking) maxRank else minMaxRanking.maxRanking)
+                val maxRank = preferences.getInt("maxRank", minMaxRanking.maxRanking)
+                selectedMinMaxRanking = MinMaxRanking(
+                    if(minRank > minMaxRanking.minRanking) minRank else minMaxRanking.minRanking,
+                    if (maxRank < minMaxRanking.maxRanking) maxRank else minMaxRanking.maxRanking
+                )
                 selectedTags = preferences.getStringSet("tags", setOf())?.toList()?: emptyList()
                 frequency =  preferences.getString("frequency", "7")!!.toInt() * -1
                 maxLifeTimeMessages = preferences.getString("max", "100")!!.toInt()
                 top = preferences.getString("bulk", "-1")!!.toInt()
-                contacts = if(!isLive) dbHelper.getFreshTopTestContacts(if(top>0) top else count)
-                    else if(lifeTimeLimit) dbHelper.getFreshLimitedTopContacts(frequency, maxLifeTimeMessages, if(top>0) top else count)
-                else dbHelper.getFreshTopContacts(frequency, if(top>0) top else count)
+                contacts = dbHelper.getFreshFilteredLimitedTopContacts(frequency,
+                    if(lifeTimeLimit) maxLifeTimeMessages else -1,
+                    if(top>0) top else count,
+                    selectedTags,
+                    selectedTags.size,
+                    selectedMinMaxRanking.minRanking,
+                    selectedMinMaxRanking.maxRanking,
+                    !isLive)
                 _status.postValue(INITIATED)
-//                _error.postValue("")
                 hasBroadcastErrors()
             }
         }
@@ -186,9 +194,13 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
 
     private fun isInBroadcastWindow(): Boolean {
         val startTimeInMinutes = preferences.getInt("start_hour", 7) * 60 + preferences.getInt("start_minute", 0)
-        val endTimeInMinutes = preferences.getInt("end_hour", 20) * 60 + preferences.getInt("end_minute", 30)
-        val nowTimeInMinutes = Calendar.getInstance().let { calendar ->
+        var endTimeInMinutes = preferences.getInt("end_hour", 20) * 60 + preferences.getInt("end_minute", 30)
+        var nowTimeInMinutes = Calendar.getInstance().let { calendar ->
             calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
+        }
+        if(startTimeInMinutes > endTimeInMinutes) {
+            endTimeInMinutes += 24 * 60
+            nowTimeInMinutes += 24 * 60
         }
         return nowTimeInMinutes in startTimeInMinutes..endTimeInMinutes
     }

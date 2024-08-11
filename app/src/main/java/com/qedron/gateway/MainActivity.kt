@@ -685,10 +685,9 @@ class MainActivity : ComponentActivity() {
                                 val intent = Intent(this@MainActivity, SettingsActivity::class.java)
                                 intent.putExtra("scroll", "restore")
                                 startActivity(intent)
-                            } else {
-                                editor.putBoolean("fresh", false)
-                                editor.apply()
                             }
+                            editor.putBoolean("fresh", false)
+                            editor.apply()
                         }
                     }).show()
         }

@@ -18,8 +18,9 @@ class DatabaseHelperImpl(private val contactDatabase: ContactDatabase) : Databas
         tags: List<String>,
         tagsSize: Int,
         minRank: Int,
-        maxRank: Int
-    )= contactDatabase.contactDao().getFreshFilteredLimitedTopContacts(days,maxMsg,limit,tags,minRank,maxRank)
+        maxRank: Int,
+        isTest: Boolean
+    )= contactDatabase.contactDao().getFreshFilteredLimitedTopContacts(days, maxMsg, limit, tags, tagsSize, minRank, maxRank, isTest)
 
     override suspend fun getFreshLimitedTopContacts(days: Int, maxMsg:Int, limit:Int): List<Contact> = contactDatabase.contactDao().getFreshLimitedTopContacts(days, maxMsg, limit)
 

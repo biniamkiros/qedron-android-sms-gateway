@@ -59,9 +59,8 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
         dialogInput = findViewById(R.id.dialogInput)
         modeTxt = findViewById(R.id.modeTxt)
 
-        handleStatusChange(viewModel.status.value)
-
         dialogInput?.editText?.setText(viewModel.broadcastMessage)
+
         dialogInput?.editText?.doAfterTextChanged {
             viewModel.isMessageModified = true
             viewModel.broadcastMessage = it.toString()
@@ -76,6 +75,7 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
         viewModel.status.observe(this) { handleStatusChange(it) }
         viewModel.error.observe(this){ showBroadcastReady() }
 
+        handleStatusChange(viewModel.status.value)
     }
 
     private fun handleStatusChange(status: String?) {
@@ -120,6 +120,7 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
 
     private fun showBroadcastReady() {
         if (viewModel.status.value == BroadcastViewModel.ABORTED
+            || viewModel.status.value == BroadcastViewModel.ONGOING
             || viewModel.status.value == BroadcastViewModel.COMPLETED)
             return
         val error = viewModel.error.value?:""
@@ -207,6 +208,7 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
     }
 
     private fun showTagsMenu() {
+        if (viewModel.status.value == BroadcastViewModel.ONGOING) return
         if (viewModel.tags.isEmpty()) {
             Toast.makeText(context, "no tags found.", Toast.LENGTH_LONG).show()
         } else {
@@ -219,9 +221,9 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
                 listView.setItemChecked(i, viewModel.selectedTags.contains(viewModel.tags[i]))
             }
 
-            AlertDialog.Builder(context, R.style.AlertDialogCustom).apply {
-                setView(dialogView)
-                setPositiveButton("OK") { dialog, _ ->
+            AlertDialog.Builder(context, R.style.AlertDialogCustom)
+                .setView(dialogView)
+                .setPositiveButton("OK") { dialog, _ ->
                     val selectedItems = mutableListOf<String>()
                     for (i in viewModel.tags.indices) {
                         if (listView.isItemChecked(i)) {
@@ -235,13 +237,14 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
                     viewModel.initBroadCast()
                     dialog.dismiss()
                 }
-                create()
-                show()
-            }
+                .create()
+                .show()
+
         }
     }
 
     private fun showRangeMenu(){
+        if (viewModel.status.value == BroadcastViewModel.ONGOING) return
         if (viewModel.minMaxRanking.minRanking < viewModel.minMaxRanking.maxRanking) {
             val dialogView = layoutInflater.inflate(R.layout.dialog_number_range_slider, null)
             val rangeSlider = dialogView.findViewById<RangeSlider>(R.id.rangeSlider)
@@ -256,7 +259,7 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
                 if (min >= from && max <= to) {
                     rangeSlider.valueFrom = from
                     rangeSlider.valueTo = to
-                    rangeSlider.values = listOf(min, if(max.toInt() ==0) to else max)
+                    rangeSlider.values = listOf(min, max)//if(max.toInt() == 0) to else max)
 
                     AlertDialog.Builder(context, R.style.AlertDialogCustom)
                         .setTitle("Select ranking range")

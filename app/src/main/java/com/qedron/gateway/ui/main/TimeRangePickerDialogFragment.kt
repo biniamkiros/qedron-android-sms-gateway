@@ -16,11 +16,11 @@ import com.qedron.gateway.R
 class TimeRangePickerDialogFragment : DialogFragment() {
 
     private lateinit var timeRangePicker:TimeRangePicker
-    private lateinit var start_time: TextView
+    private lateinit var startTime: TextView
     private lateinit var duration: TextView
-    private lateinit var end_time: TextView
-    private lateinit var wake_layout: LinearLayout
-    private lateinit var bedtime_layout: LinearLayout
+    private lateinit var endTime: TextView
+    private lateinit var wakeLayout: LinearLayout
+    private lateinit var bedtimeLayout: LinearLayout
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context = requireContext()
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -31,11 +31,11 @@ class TimeRangePickerDialogFragment : DialogFragment() {
 
         val layout = layoutInflater.inflate(R.layout.time_range_picker_layout, null) as ConstraintLayout
 
-        start_time = layout.findViewById(R.id.start_time)
+        startTime = layout.findViewById(R.id.start_time)
         duration = layout.findViewById(R.id.duration)
-        end_time = layout.findViewById(R.id.end_time)
-        wake_layout = layout.findViewById(R.id.wake_layout)
-        bedtime_layout = layout.findViewById(R.id.bedtime_layout)
+        endTime = layout.findViewById(R.id.end_time)
+        wakeLayout = layout.findViewById(R.id.wake_layout)
+        bedtimeLayout = layout.findViewById(R.id.bedtime_layout)
 
         timeRangePicker = layout.findViewById<TimeRangePicker>(R.id.timeRangePicker).apply {
             startTimeMinutes = startHour * 60 + startMinute
@@ -107,8 +107,8 @@ class TimeRangePickerDialogFragment : DialogFragment() {
 
     @SuppressLint("SetTextI18n")
     private fun updateTimes() {
-        end_time.text = timeRangePicker.endTime.toString()
-        start_time.text = timeRangePicker.startTime.toString()
+        endTime.text = timeRangePicker.endTime.toString()
+        startTime.text = timeRangePicker.startTime.toString()
     }
 
     private fun updateDuration() {
@@ -116,8 +116,8 @@ class TimeRangePickerDialogFragment : DialogFragment() {
     }
 
     private fun animate(thumb: TimeRangePicker.Thumb, active: Boolean) {
-        val activeView = if(thumb == TimeRangePicker.Thumb.START) bedtime_layout else wake_layout
-        val inactiveView = if(thumb == TimeRangePicker.Thumb.START) wake_layout else bedtime_layout
+        val activeView = if(thumb == TimeRangePicker.Thumb.START) bedtimeLayout else wakeLayout
+        val inactiveView = if(thumb == TimeRangePicker.Thumb.START) wakeLayout else bedtimeLayout
         val direction = if(thumb == TimeRangePicker.Thumb.START) 1 else -1
 
         activeView
