@@ -96,39 +96,4 @@ class ContactRecyclerViewAdapter(
         }
 
     }
-
-//    fun <T : RecyclerView.ViewHolder> T.listen(event: (position: Int, type: Int) -> Unit): T {
-//        itemView.setOnClickListener {
-//            event.invoke(getAdapterPosition(), itemViewType)
-//        }
-//        return this
-//    }
-
-
-    internal inner class ContactDiffCallback(oldContacts: List<ContactWithMessages>, newContacts: List<ContactWithMessages>) :
-        DiffUtil.Callback() {
-        private val oldContacts: List<ContactWithMessages>
-        private val newContacts: List<ContactWithMessages>
-
-        init {
-            this.oldContacts = oldContacts
-            this.newContacts = newContacts
-        }
-
-        override fun getOldListSize(): Int {
-            return oldContacts.size
-        }
-
-        override fun getNewListSize(): Int {
-            return newContacts.size
-        }
-
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldContacts[oldItemPosition].contact.id.equals(newContacts[newItemPosition].contact.id)
-        }
-
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldContacts[oldItemPosition] == newContacts[newItemPosition]
-        }
-    }
 }

@@ -72,9 +72,9 @@ fun String.isStringNumeric() :Boolean {
     return toIntOrNull() != null
 }
 
-@SuppressWarnings("deprecation")
 fun Context.isServiceRunning(serviceClass: Class<*>): Boolean {
     val activityManager = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    @Suppress("DEPRECATION")
     for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
         if (serviceClass.name == service.service.className) {
             return true

@@ -212,8 +212,8 @@ class ContactsFragment : Fragment() {
                 binding.searchContactInput.visibility = View.GONE
             }
         }
-        viewModel.updateContact.observe(viewLifecycleOwner, Observer<Contact?> {
-            if(it != null) {
+        viewModel.updateContact.observe(viewLifecycleOwner) {
+            if (it != null) {
                 contactsAdapter.dataChanged(it)
                 if (!it.isTest)
                     Toast.makeText(
@@ -222,7 +222,7 @@ class ContactsFragment : Fragment() {
                         Toast.LENGTH_LONG
                     ).show()
             }
-        })
+        }
         binding.searchContactInput.editText?.afterTextChanged {
             searchText = it
             contactsAdapter.clearData()
@@ -230,10 +230,9 @@ class ContactsFragment : Fragment() {
             viewModel.searchPaginatedContacts(searchText, 0, initialPerPage, orderBy, sortBy)
         }
         viewModel.getContactsCount("")
-        viewModel.contactCount.observe(viewLifecycleOwner, Observer<Int> { it ->
-            val result = it ?: return@Observer
-            (activity as ContactsActivity).supportActionBar?.subtitle = "$result contacts"
-        })
+        viewModel.contactCount.observe(viewLifecycleOwner) { it ->
+            (activity as ContactsActivity).supportActionBar?.subtitle = "$it contacts"
+        }
 
         if(contactsAdapter.itemCount > 0){
             binding.emptyList.visibility = View.GONE

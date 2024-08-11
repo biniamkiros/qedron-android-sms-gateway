@@ -132,11 +132,14 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
         } else {
             selectedTags.joinToString(", ") { it.ifEmpty { "untagged" } }
                 .let {
-                    if (it.length > 14) it.take(20) + "..." else it
+                    if (it.length > 14) it.take(14) + "..." else it
                 }
         }
 
-        rangeBtn?.text = viewModel.selectedMinMaxRanking.let { if(it.minRanking < it.maxRanking) "$${it.minRanking} - $${it.maxRanking}" else "full range" }
+        val minMax = viewModel.minMaxRanking
+        rangeBtn?.text = viewModel.selectedMinMaxRanking.let { if(it.minRanking > minMax.minRanking
+            || it.maxRanking < minMax.maxRanking) "$${it.minRanking} - $${it.maxRanking}" else "full range" }
+
          if(viewModel.isLive) {
              modeTxt?.text = context.getString(R.string.live)
              modeTxt?.setTextColor(context.getColor(R.color.colorLive))
@@ -249,16 +252,16 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
             val rangeSlider = dialogView.findViewById<RangeSlider>(R.id.rangeSlider)
 
             try {
-                val from = viewModel.minMaxRanking.minRanking.toFloat() ?: 0f
-                val to = viewModel.minMaxRanking.maxRanking.toFloat() ?: 100f
+                val from = viewModel.minMaxRanking.minRanking.toFloat()
+                val to = viewModel.minMaxRanking.maxRanking.toFloat()
 
-                val min = viewModel.selectedMinMaxRanking.minRanking.toFloat() ?: from
-                val max = viewModel.selectedMinMaxRanking.maxRanking.toFloat() ?: to
+                val min = viewModel.selectedMinMaxRanking.minRanking.toFloat()
+                val max = viewModel.selectedMinMaxRanking.maxRanking.toFloat()
 
                 if (min >= from && max <= to) {
                     rangeSlider.valueFrom = from
                     rangeSlider.valueTo = to
-                    rangeSlider.values = listOf(min, max)
+                    rangeSlider.values = listOf(min, if(max.toInt() ==0) to else max)
 
                     AlertDialog.Builder(context, R.style.AlertDialogCustom)
                         .setTitle("Select ranking range")
