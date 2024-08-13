@@ -3,7 +3,6 @@ package com.qedron.gateway
 import android.app.ActivityManager
 import android.content.Context
 import android.content.res.Resources
-import android.os.Build
 import android.text.Editable
 import android.text.Html
 import android.text.Spanned

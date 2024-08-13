@@ -387,7 +387,7 @@ class MainActivity : ComponentActivity() {
                     val update = "processing ${index + 1}/${rows.size} contacts..."
                     dialog.findViewById<TextView>(R.id.progress_msg).text = update
                 }
-                val phoneNumber = "0${phone.toString().takeLast(9).trim()}"
+                val phoneNumber = "0${phone.takeLast(9).trim()}"
                 if (phoneNumber.length > 9 && phoneNumber.isStringNumeric()) {
                     val existingUser = dbHelper.getContactByPhone(phoneNumber)
                     if (existingUser != null) {

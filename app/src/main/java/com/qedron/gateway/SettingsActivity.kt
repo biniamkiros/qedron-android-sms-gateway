@@ -23,7 +23,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import com.qedron.gateway.ui.main.TimeRangePickerDialogFragment
 import de.raphaelebner.roomdatabasebackup.core.RoomBackup
