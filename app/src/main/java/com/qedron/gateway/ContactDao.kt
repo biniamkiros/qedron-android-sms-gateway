@@ -128,6 +128,9 @@ interface ContactDao {
     @Query("DELETE FROM contacts")
     fun deleteAllContacts()
 
+    @Query("DELETE FROM contacts WHERE tag IN (:tags)")
+    fun deleteContactsByTags(tags: List<String>)
+
     @Query(
         """
     SELECT contacts.*, COALESCE(messageCount, 0) AS messageCount
@@ -146,7 +149,7 @@ interface ContactDao {
                FROM messages 
                WHERE message LIKE '%' || :searchText || '%' 
            )
-           OR :searchText IS NULL OR :searchText = '')
+           OR :searchText IS NULL OR :searchText = '') AND isTest = :isTest 
     ORDER BY 
     CASE 
         WHEN :sortBy = 'ASC' THEN
@@ -184,11 +187,12 @@ interface ContactDao {
         offset: Int,
         limit: Int,
         orderBy: String,
-        sortBy: String
+        sortBy: String,
+        isTest: Boolean
     ): List<ContactWithMessages>
 
 
-    @Query("""SELECT COUNT(*) FROM contacts
+    @Query("""SELECT COUNT(*) FROM contacts 
         LEFT JOIN (
             SELECT contactId, COUNT(id) AS messageCount
             FROM messages
@@ -203,7 +207,7 @@ interface ContactDao {
                    FROM messages 
                    WHERE message LIKE '%' || :searchText || '%' 
                )
-               OR :searchText IS NULL OR :searchText = '')
+               OR :searchText IS NULL OR :searchText = '') AND isTest = :isTest
     """)
-    fun countSearchContacts(searchText: String): Int
+    fun countSearchContacts(searchText: String, isTest: Boolean): Int
 }

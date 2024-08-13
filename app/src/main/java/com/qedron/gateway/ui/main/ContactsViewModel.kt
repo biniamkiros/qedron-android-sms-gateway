@@ -1,9 +1,11 @@
 package com.qedron.gateway.ui.main
 
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.preference.PreferenceManager
 import com.qedron.gateway.Contact
 import com.qedron.gateway.ContactWithMessages
 import com.qedron.gateway.DatabaseHelperImpl
@@ -14,8 +16,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class ContactsViewModel(private val dbHelper: DatabaseHelperImpl) : ViewModel() {
+class ContactsViewModel(context: Context, private val dbHelper: DatabaseHelperImpl) : ViewModel() {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
+    private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
     private var _contactList = MutableLiveData<List<ContactWithMessages>>()
     var contactList: LiveData<List<ContactWithMessages>> = _contactList
     private var _updateContact = MutableLiveData<Contact?>()
@@ -26,7 +29,7 @@ class ContactsViewModel(private val dbHelper: DatabaseHelperImpl) : ViewModel() 
     fun getContactsCount(searchText: String) {
         scope.launch {
             withContext(Dispatchers.IO) {
-                val result = dbHelper.searchCountContacts(searchText)
+                val result = dbHelper.searchCountContacts(searchText,!preferences.getBoolean("live", false))
                 withContext(Dispatchers.Main){
                     _contactCount.value = result
                 }
@@ -37,7 +40,7 @@ class ContactsViewModel(private val dbHelper: DatabaseHelperImpl) : ViewModel() 
     fun searchPaginatedContacts(searchText: String, offset: Int, limit: Int, order:String, sortBy: String) {
         scope.launch {
             withContext(Dispatchers.IO) {
-                val result = dbHelper.searchPaginatedContacts(searchText, offset, limit, order, sortBy)
+                val result = dbHelper.searchPaginatedContacts(searchText, offset, limit, order, sortBy, !preferences.getBoolean("live", false))
                 withContext(Dispatchers.Main){
                     if(result.isNotEmpty()) _contactList.value = result
                 }

@@ -256,7 +256,7 @@ object GatewayServiceUtil {
                 phoneNumber = "$prefix${i.toString().padStart(8, '0')}",
                 details = "${title.random()} at ${companies.random()} ${companyTypes.random()}",
                 tag =  tags.random(),
-                ranking = Random.nextInt(10, 10001) * 1000,
+                ranking = Random.nextLong(10, 10001) * 1000,
                 isTest = true
             ))
         }

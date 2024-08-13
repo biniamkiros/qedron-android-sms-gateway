@@ -155,7 +155,7 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
                     } else {
                         delay(ceil((carrierLimit/2).toDouble()).toLong())
                         var progress =
-                            "${index + 1}/${contacts.size} sending sms to ${if (contact.name.isEmpty()) contact.phoneNumber else "${contact.name} - ${contact.phoneNumber}"}"
+                            "${index + 1}/${contacts.size} sending to ${if (contact.name.isEmpty()) contact.phoneNumber else "${contact.name} - ${contact.phoneNumber}"}"
                         _progress.postValue(progress)
                         delay(ceil((carrierLimit/2).toDouble()).toLong())
                         val success = GatewayServiceUtil.sendMessage(
@@ -178,7 +178,7 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
                             )
                         }
                         progress =
-                            "${index + 1}/${contacts.size} ${if(success) "sent sms" else "error sending"} to ${if (contact.name.isEmpty()) contact.phoneNumber else "${contact.name} - ${contact.phoneNumber}"}"
+                            "${index + 1}/${contacts.size} ${if(success) "sms sent" else "error sending"} to ${if (contact.name.isEmpty()) contact.phoneNumber else "${contact.name} - ${contact.phoneNumber}"}"
                         _progress.postValue(progress)
                     }
                 }
@@ -211,11 +211,11 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
     private fun hasBroadcastErrors(): Boolean {
         var error = ""
         if(!isInBroadcastWindow())
-            error="Broadcast not allowed at this time of day."
+            error= application.getString(R.string.broadcast_not_allowed_at_this_hour_go_to_settings)
         else if (this::contacts.isInitialized && contacts.isEmpty())
-            error="No available contacts."
+            error= application.getString(R.string.no_available_contacts_go_to_settings)
         else if(broadcastMessage.isEmpty() && isMessageModified)
-            error="Message cannot be empty"
+            error= application.getString(R.string.message_cannot_be_empty)
         _error.postValue(error)
         return error.isNotEmpty()
     }

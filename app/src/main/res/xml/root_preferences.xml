@@ -75,9 +75,9 @@
             app:summary="@string/seed_summary"/>
 
         <Preference
-            app:key="reset"
-            app:title="@string/reset_title"
-            app:summary="@string/reset_summary" />
+            app:key="remove"
+            app:title="@string/remove_title"
+            app:summary="@string/remove_summary" />
 
     </PreferenceCategory>
 

@@ -79,7 +79,7 @@ class ContactRecyclerViewAdapter(
 
         fun bind(contact: ContactWithMessages?) {
             if (contact != null) {
-                val stat = "last contact ${contact.contact.lastContact.formattedTimeElapsed(context, "never")} • ${if (contact.messages.isNotEmpty()) "${contact.messages.size} sms sent" else "fresh"}"
+                val stat = "\uD83C\uDFF7\uFE0F   ${contact.contact.tag.ifEmpty { "untagged" }}   •   ${contact.contact.lastContact.formattedLastContactTimeElapsed(context, "Uncontacted")}   •   ${if (contact.messages.isNotEmpty()) "${contact.messages.size} sms sent" else "fresh"}"
                 numberTxt.text = contact.contact.phoneNumber
                 rankTxt.text = contact.contact.ranking.formattedNumber("$")
                 nameTxt.text =

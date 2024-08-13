@@ -18,7 +18,7 @@ data class Contact(
     var details: String = "",
     var phoneNumber: String,
     var tag: String = "",
-    var ranking: Int = 0,
+    var ranking: Long = 0,
     var lastContact: Date? = null,
     var blocked: Boolean = false,
     val isTest:Boolean = false

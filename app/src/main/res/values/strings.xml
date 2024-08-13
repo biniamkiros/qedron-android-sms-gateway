@@ -37,8 +37,8 @@
     <string name="live_summary_on">Broadcast messages are sent to your actual contacts. Make sure you everything is correct. If you wan to test the app, switch to test mode.</string>
 
     <!-- Contacts Preferences -->
-    <string name="reset_title">Reset contacts list</string>
-    <string name="reset_summary">Clear your contact list if your imported data is bad, corrupted or before importing a fresh list of contacts.</string>
+    <string name="remove_title">Remove contacts list</string>
+    <string name="remove_summary">Clear some of your contact list if your imported data is bad, corrupted or before importing a fresh list of contacts.</string>
 
     <!-- Database Import Preferences -->
     <string name="backup_title">Backup database</string>
@@ -83,7 +83,7 @@
     <string name="dialog_locationShareDescription">ተሽከርካሪዎ፡ከእርስዎ፡ያለውን፡ርቀት፡መጠበቁን፡ለማወቅ፡የአካባቢ፡ማጋራት፡ያስፈልጋል።</string>
     <string name="dialog_locationShareTitle">አካባቢዎን፡ያጋሩ</string>
     <string name="dialog_reset">delete</string>
-    <string name="dialog_reset_desc">This process cannot be reversed. You will loose all contacts that you have previously imported</string>
+    <string name="dialog_reset_desc">This process cannot be reversed. You will loose all contacts under the selected tags that you have previously imported</string>
     <string name="dialog_reset_title">Are you sure?</string>
     <string name="dialog_take_me_back">go back</string>
     <string name="dialog_delete_account">ደምስስ</string>
@@ -92,10 +92,18 @@
     <string name="dialog_delete_account_take_me_back">ይቅርብኝ</string>
     <string name="dialog_action_isolate">ነጥል</string>
 
-    <string name="dialog_import_title">Choose import type</string>
-    <string name="dialog_import_desc">You can automatically restore a database from the default backup location (overwrites your data) or import (add to list) contacts from a fresh CSV file.\n\ncsv files must at least contain one column \'<b>phone</b>\' and can also include columns \'<b>name</b>\', \'<b>details</b>\', \'<b>tag</b>\', \'<b>rank</b>\' in order to help with sms campaign segmentation.</string>
-
+    <string name="dialog_import_title">Import contacts</string>
+    <string name="dialog_import_desc">Add contacts from a fresh CSV file. The expected columns are&lt;br/&gt;
+        &lt;br/&gt;
+        - &lt;font color="#FDD835"&gt;&lt;b&gt;phone&lt;/b&gt;&lt;/font&gt;&#160;&#160;&#160;&#160;&#160;is required, no trailing 0s&lt;br/&gt;
+        - &lt;font color="#FDD835"&gt;&lt;b&gt;name&lt;/b&gt;&lt;/font&gt;&#160;&#160;&#160;&#160;&#160;&#160;optional&lt;br/&gt;
+        - &lt;font color="#FDD835"&gt;&lt;b&gt;details&lt;/b&gt;&lt;/font&gt;&#160;&#160;&#160;optional&lt;br/&gt;
+        - &lt;font color="#FDD835"&gt;&lt;b&gt;tag&lt;/b&gt;&lt;/font&gt;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;optional&lt;br/&gt;
+        - &lt;font color="#FDD835"&gt;&lt;b&gt;rank&lt;/b&gt;&lt;/font&gt;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;optional&lt;br/&gt;
+        &lt;br/&gt;
+        in order to help with SMS campaign segmentation.</string>
     <string name="dialog_import_file">Import</string>
+    <string name="dialog_import_cancel">Cancel</string>
     <string name="dialog_import_restore">Restore</string>
 
     <string name="dialog_restore_title">Database found on device</string>
@@ -152,4 +160,7 @@
     <string name="select_tags">Select tags</string>
     <string name="all_tags">all tags</string>
     <string name="full_range">full range</string>
+    <string name="broadcast_not_allowed_at_this_hour_go_to_settings">Broadcast not allowed at this hour. Go to settings</string>
+    <string name="no_available_contacts_go_to_settings">No available contacts. Go to settings</string>
+    <string name="message_cannot_be_empty">Message cannot be empty.</string>
 </resources>

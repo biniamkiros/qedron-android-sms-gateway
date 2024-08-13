@@ -12,14 +12,18 @@ import android.os.Environment
 import android.provider.Settings
 import android.util.Log
 import android.view.MenuItem
+import android.widget.ArrayAdapter
+import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import com.qedron.gateway.ui.main.TimeRangePickerDialogFragment
 import de.raphaelebner.roomdatabasebackup.core.RoomBackup
@@ -130,48 +134,8 @@ class SettingsActivity : AppCompatActivity() {
 
             backup = context?.let { RoomBackup(it) }!!
 
-            findPreference<Preference>("reset")?.setOnPreferenceClickListener {
-
-                context?.let { it1 ->
-                    DialogBottomSheet(
-                        it1,
-                        getString(R.string.dialog_reset_title),
-                        getString(R.string.dialog_reset_desc),
-                        getString(R.string.dialog_take_me_back),
-                        getString(R.string.dialog_reset),
-                        true,
-                        R.color.colorError,
-                        object : DialogBottomSheet.DialogListener {
-                            override fun onGo(isGo: Boolean) {
-                                if (isGo) {
-                                    scope.launch {
-                                        withContext(Dispatchers.IO) {
-                                            try {
-                                                DatabaseHelperImpl(
-                                                    ContactDatabase.getDatabase(it1)
-                                                ).deleteAllContacts()
-                                                withContext(Dispatchers.Main) {
-                                                    Toast.makeText(
-                                                        it1, "You contact list has been reset.",
-                                                        Toast.LENGTH_LONG
-                                                    ).show()
-                                                }
-                                            } catch (e: Exception) {
-                                                withContext(Dispatchers.Main) {
-                                                    Toast.makeText(
-                                                        it1,
-                                                        "Error deleting contacts. Try again later.",
-                                                        Toast.LENGTH_LONG
-                                                    ).show()
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                }
-                            }
-                        }).show()
-                }
+            findPreference<Preference>("remove")?.setOnPreferenceClickListener {
+                showDeleteTagsMenu()
                 return@setOnPreferenceClickListener true
             }
             findPreference<Preference>("time_range")?.setOnPreferenceClickListener {
@@ -209,6 +173,92 @@ class SettingsActivity : AppCompatActivity() {
             }
 
         }
+
+        private fun showDeleteTagsMenu() {
+            context?.let { it1 ->
+                scope.launch {
+                    withContext(Dispatchers.IO) {
+                        try {
+                            val dbHelper = DatabaseHelperImpl(
+                                ContactDatabase.getDatabase(it1)
+                            )
+                            val tags = dbHelper.getAllUniqueTags()
+
+                            withContext(Dispatchers.Main){
+                                if (tags.isEmpty()) {
+                                    Toast.makeText(context, "no tags found.", Toast.LENGTH_LONG).show()
+                                } else {
+                                    val dialogView = layoutInflater.inflate(R.layout.multiselect_popup, null)
+                                    val listView: ListView = dialogView.findViewById(R.id.tagList)
+                                    val adapter = ArrayAdapter(it1, android.R.layout.simple_list_item_multiple_choice, tags.map { it.ifEmpty { "untagged" } })
+                                    listView.adapter = adapter
+
+                                    AlertDialog.Builder(it1, R.style.AlertDialogCustom)
+                                        .setView(dialogView)
+                                        .setNegativeButton("CANCEL"){ dialog, _ -> dialog.dismiss()}
+                                        .setPositiveButton("DELETE") { dialog, _ ->
+                                            val selectedItems = mutableListOf<String>()
+                                            for (i in tags.indices) {
+                                                if (listView.isItemChecked(i)) {
+                                                    selectedItems.add(tags[i])
+                                                }
+                                            }
+                                            DialogBottomSheet(
+                                                it1,
+                                                getString(R.string.dialog_reset_title),
+                                                getString(R.string.dialog_reset_desc),
+                                                getString(R.string.dialog_take_me_back),
+                                                getString(R.string.dialog_reset),
+                                                true,
+                                                R.color.colorError,
+                                                object : DialogBottomSheet.DialogListener {
+                                                    override fun onGo(isGo: Boolean) {
+                                                        if (isGo) {
+                                                            scope.launch {
+                                                                withContext(Dispatchers.IO) {
+                                                                    try {
+                                                                        dbHelper.deleteContactsByTags(selectedItems)
+                                                                        withContext(Dispatchers.Main) {
+                                                                            Toast.makeText(
+                                                                                it1, "You contact with tags ${selectedItems.joinToString(",")} list has been deleted.",
+                                                                                Toast.LENGTH_LONG
+                                                                            ).show()
+                                                                        }
+                                                                    } catch (e: Exception) {
+                                                                        withContext(Dispatchers.Main) {
+                                                                            Toast.makeText(
+                                                                                it1,
+                                                                                "Error deleting contacts. Try again later.",
+                                                                                Toast.LENGTH_LONG
+                                                                            ).show()
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }).show()
+                                            dialog.dismiss()
+                                        }
+                                        .create()
+                                        .show()
+
+                                }
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(
+                                    it1,
+                                    "Error deleting contacts. Try again later.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
         private fun checkWriteFilePermission():Boolean {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

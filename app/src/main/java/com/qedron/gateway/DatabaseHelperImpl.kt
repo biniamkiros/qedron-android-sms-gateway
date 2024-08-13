@@ -3,9 +3,9 @@ package com.qedron.gateway
 class DatabaseHelperImpl(private val contactDatabase: ContactDatabase) : DatabaseHelper {
     override suspend fun getAllContacts(): List<ContactWithMessages> = contactDatabase.contactDao().getAllContacts()
 
-    override suspend fun searchPaginatedContacts(searchText: String, offset: Int, limit: Int, order:String, sortBy: String): List<ContactWithMessages> = contactDatabase.contactDao().searchPaginatedContacts(searchText, offset, limit, order, sortBy)
+    override suspend fun searchPaginatedContacts(searchText: String, offset: Int, limit: Int, order:String, sortBy: String, isTest: Boolean): List<ContactWithMessages> = contactDatabase.contactDao().searchPaginatedContacts(searchText, offset, limit, order, sortBy, isTest)
 
-    override suspend fun searchCountContacts(searchText: String): Int = contactDatabase.contactDao().countSearchContacts(searchText)
+    override suspend fun searchCountContacts(searchText: String, isTest: Boolean): Int = contactDatabase.contactDao().countSearchContacts(searchText, isTest)
 
     override fun getAllUniqueTags()= contactDatabase.contactDao().getAllUniqueTags()
 
@@ -43,6 +43,8 @@ class DatabaseHelperImpl(private val contactDatabase: ContactDatabase) : Databas
     override suspend fun countContacts(isTest: Boolean): Int = contactDatabase.contactDao().countContacts(isTest)
 
     override suspend fun deleteAllContacts() = contactDatabase.contactDao().deleteAllContacts()
+
+    override suspend fun deleteContactsByTags(tags: List<String>) = contactDatabase.contactDao().deleteContactsByTags(tags)
 
     override suspend fun insertMessage(message: Message) = contactDatabase.messageDao().insert(message)
 

@@ -67,6 +67,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private var pickFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+
         if (result.resultCode == Activity.RESULT_OK) {
             // The result data contains a URI for the document or directory that
             // the user selected.
@@ -120,6 +121,7 @@ class MainActivity : ComponentActivity() {
     ) {
         if (Environment.isExternalStorageManager()) checkFresh()
     }
+
     private fun checkReadFilePermission():Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
@@ -163,16 +165,6 @@ class MainActivity : ComponentActivity() {
     }
 
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        setIntent(intent)
-        if(viewModel.status.value == BroadcastViewModel.ONGOING) {
-            openBroadcastSheet()
-        } else {
-           // stopBroadcastService()
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -215,7 +207,6 @@ class MainActivity : ComponentActivity() {
                 BroadcastViewModel.COMPLETED -> stopBroadcastService()
             }
         }
-
     }
 
     private fun checkSMSPermission():Boolean {
@@ -313,7 +304,8 @@ class MainActivity : ComponentActivity() {
     private var overrideName = false
     private var overrideDetail = false
     private var overrideRanking = false
-    private var overrideTagCustom = ""
+    private var overrideTag = false
+    private var customTag = ""
     private var doForAll = false
     @Throws(IOException::class)
     private fun importContacts(uri: Uri) {
@@ -335,7 +327,8 @@ class MainActivity : ComponentActivity() {
                         overrideName = false
                         overrideDetail = false
                         overrideRanking = false
-                        overrideTagCustom = ""
+                        overrideTag = false
+                        customTag = ""
                         doForAll = false
                         insertContact(
                             rows,
@@ -351,173 +344,219 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    var prevIndex = -1
+    private var prevIndex = -1
     private suspend fun insertContact(
         rows: List<Map<String, String>>,
         index: Int,
         dialog: AlertDialog,
         dbHelper: DatabaseHelperImpl
     ) {
-        if(prevIndex >= index) return
-        prevIndex = index // prevent infinite loop
-        if (index == 0) {
-            withContext(Dispatchers.Main) {
-                dialog.show()
+        try {
+            if (prevIndex >= index) return
+            prevIndex = index // prevent infinite loop
+            if (index == 0) {
+                withContext(Dispatchers.Main) {
+                    dialog.show()
+                }
+            } else if (rows.size <= index) {
+                prevIndex = -1
+                withContext(Dispatchers.Main) {
+                    dialog.cancel()
+                    val text = if (newSize > 0 || modifiedSize > 0)
+                        "Imported $newSize and updated $modifiedSize contacts"
+                    else
+                        "Import not successful. Make sure the file contains at least on column named 'phone'"
+                    Toast.makeText(
+                        this@MainActivity, text,
+                        Toast.LENGTH_LONG
+                    ).show()
+                    updateContactCount()
+                    newSize = 0
+                    modifiedSize = 0
+                }
+                return
             }
-        } else if (rows.size <= index) {
-            prevIndex = -1
-            withContext(Dispatchers.Main) {
-                dialog.cancel()
-                val text = if (newSize > 0 || modifiedSize > 0)
-                    "Imported $newSize and updated $modifiedSize contacts"
-                else
-                    "Import not successful. Make sure the file contains at least on column named 'phone'"
-                Toast.makeText(
-                    this@MainActivity, text,
-                    Toast.LENGTH_LONG
-                ).show()
-                updateContactCount()
-                newSize = 0
-                modifiedSize = 0
-            }
-            return
-        }
-        val r = rows[index]
-        val name = if (r["name"].isNullOrEmpty()) "" else r["name"]
-        val details = if (r["details"].isNullOrEmpty()) "" else r["details"]
-        val phone = if (r["phone"].isNullOrEmpty()) "" else r["phone"]
-        val tag = if (r["tag"].isNullOrEmpty()) "" else r["tag"]
-        val rank = if (r["rank"].isNullOrEmpty()) 0 else r["rank"]?.toInt() ?: 0
-        if (phone !== null && phone.isNotEmpty()) {
-            withContext(Dispatchers.Main) {
-                val update = "processing ${index + 1}/${rows.size} contacts..."
-                dialog.findViewById<TextView>(R.id.progress_msg).text = update
-            }
-            val phoneNumber = "0${phone.toString().takeLast(9).trim()}"
-            if (phoneNumber.length > 9 && phoneNumber.isStringNumeric()) {
-                val existingUser = dbHelper.getContactByPhone(phoneNumber)
-                if (existingUser != null) {
-                    if (doForAll) {
-                        val mergedName =
-                            mergeContactValues(existingUser.name, name, overrideName, "")
-                        val mergedDetails =
-                            mergeContactValues(existingUser.details, details, overrideDetail, "")
-                        val mergedTag =
-                            overrideTagCustom.ifEmpty { combineTags(existingUser.tag, tag) }
-                        val mergedRank =
-                            mergeContactValues(existingUser.ranking, rank, overrideRanking)
+            val r = rows[index]
+            val name = r["name"]?.trim()?:""
+            val details = r["details"]?.trim()?:""
+            val phone = r["phone"]?.trim()?:""
+            val tag = r["tag"]?.trim()?:""
+            val rank = r["rank"]?.trim().toRanking()
+            if (phone.isNotEmpty()) {
+                withContext(Dispatchers.Main) {
+                    val update = "processing ${index + 1}/${rows.size} contacts..."
+                    dialog.findViewById<TextView>(R.id.progress_msg).text = update
+                }
+                val phoneNumber = "0${phone.toString().takeLast(9).trim()}"
+                if (phoneNumber.length > 9 && phoneNumber.isStringNumeric()) {
+                    val existingUser = dbHelper.getContactByPhone(phoneNumber)
+                    if (existingUser != null) {
+                        if (doForAll) {
+                            val mergedName =
+                                mergeContactInfo(existingUser.name, name, overrideName, "")
+                            val mergedDetails =
+                                mergeContactInfo(
+                                    existingUser.details,
+                                    details,
+                                    overrideDetail,
+                                    ""
+                                )
+                            val mergedTag = combineTags(
+                                    existingUser.tag,
+                                    tag,
+                                    overrideTag,
+                                    customTag
+                                )
+                            val mergedRank =
+                                mergeContactInfo(existingUser.ranking, rank, overrideRanking)
+                            dbHelper.updateContact(
+                                Contact(
+                                    id = existingUser.id,
+                                    name = mergedName,
+                                    details = mergedDetails,
+                                    phoneNumber = existingUser.phoneNumber,
+                                    tag = mergedTag,
+                                    ranking = mergedRank,
+                                    lastContact = existingUser.lastContact,
+                                    blocked = existingUser.blocked,
+                                    isTest = existingUser.isTest
+                                )
+                            )
+                            modifiedSize++
+                            insertContact(
+                                rows,
+                                index + 1,
+                                dialog,
+                                dbHelper
+                            )
+                        } else {
+                            withContext(Dispatchers.Main) {
+                                MergeContactsOptionsBottomSheet(this@MainActivity,
+                                    "Name: ${existingUser.name.getGlanceText(14)} -> ${
+                                        name.getGlanceText(
+                                            14
+                                        )
+                                    }",
+                                    "Details: ${existingUser.details.getGlanceText(14)} -> ${
+                                        details.getGlanceText(
+                                            14
+                                        )
+                                    }",
+                                    "Ranking: ${
+                                        existingUser.ranking.toString().getGlanceText(14)
+                                    } -> ${rank.toString().getGlanceText(14)}",
+                                    "${(existingUser.tag.getGlanceText(14))} -> ${
+                                        tag.getGlanceText(
+                                            14
+                                        )
+                                    }",
+                                    object :
+                                        MergeContactsOptionsBottomSheet.DialogListener {
+                                        override fun onMergeOptionsSet(
+                                            merge: Boolean,
+                                            mOverrideName: Boolean,
+                                            mOverrideDetail: Boolean,
+                                            mOverrideRanking: Boolean,
+                                            mOverrideTag: Boolean,
+                                            mTagCustom: String,
+                                            mDoForAll: Boolean
+                                        ) {
+                                            scope.launch {
+                                                withContext(Dispatchers.IO) {
+                                                    if (merge) {
+                                                        overrideName = mOverrideName
+                                                        overrideDetail =
+                                                            mOverrideDetail
+                                                        overrideRanking =
+                                                            mOverrideRanking
+                                                        overrideTag =
+                                                            mOverrideTag
+                                                        customTag =
+                                                            mTagCustom
+                                                        doForAll = mDoForAll
+
+                                                        val mergedName =
+                                                            mergeContactInfo(
+                                                                existingUser.name,
+                                                                name,
+                                                                overrideName,
+                                                                ""
+                                                            )
+                                                        val mergedDetails =
+                                                            mergeContactInfo(
+                                                                existingUser.details,
+                                                                details,
+                                                                overrideDetail,
+                                                                ""
+                                                            )
+                                                        val mergedTag =
+                                                                combineTags(
+                                                                    existingUser.tag,
+                                                                    tag,
+                                                                    overrideTag,
+                                                                    customTag
+                                                                )
+
+                                                        val mergedRank =
+                                                            mergeContactInfo(
+                                                                existingUser.ranking,
+                                                                rank,
+                                                                overrideRanking
+                                                            )
+                                                        dbHelper.updateContact(
+                                                            Contact(
+                                                                id = existingUser.id,
+                                                                name = mergedName,
+                                                                details = mergedDetails,
+                                                                phoneNumber = existingUser.phoneNumber,
+                                                                tag = mergedTag,
+                                                                ranking = mergedRank,
+                                                                lastContact = existingUser.lastContact,
+                                                                blocked = existingUser.blocked,
+                                                                isTest = existingUser.isTest
+                                                            )
+                                                        )
+                                                        modifiedSize++
+                                                        insertContact(
+                                                            rows,
+                                                            index + 1,
+                                                            dialog,
+                                                            dbHelper
+                                                        )
+
+                                                    } else {
+                                                        insertContact(
+                                                            rows,
+                                                            rows.size,
+                                                            dialog,
+                                                            dbHelper
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }).show()
+                            }
+                        }
+                    } else {
                         dbHelper.insertContact(
                             Contact(
-                                name = mergedName,
-                                phoneNumber = existingUser.phoneNumber,
-                                details = mergedDetails,
-                                tag = mergedTag,
-                                ranking = mergedRank
+                                name = name,
+                                details = details,
+                                phoneNumber = phoneNumber,
+                                tag = tag,
+                                ranking = rank
                             )
                         )
-                        modifiedSize++
+                        newSize++
                         insertContact(
                             rows,
                             index + 1,
                             dialog,
                             dbHelper
                         )
-                    } else {
-                        withContext(Dispatchers.Main) {
-                            MergeContactsOptionsBottomSheet(this@MainActivity,
-                                object :
-                                    MergeContactsOptionsBottomSheet.DialogListener {
-                                    override fun onMergeOptionsSet(
-                                        merge: Boolean,
-                                        mOverrideName: Boolean,
-                                        mOverrideDetail: Boolean,
-                                        mOverrideRanking: Boolean,
-                                        mTagCustom: String,
-                                        mDoForAll: Boolean
-                                    ) {
-                                        scope.launch {
-                                            withContext(Dispatchers.IO) {
-                                                if (merge) {
-                                                    overrideName = mOverrideName
-                                                    overrideDetail =
-                                                        mOverrideDetail
-                                                    overrideRanking =
-                                                        mOverrideRanking
-                                                    overrideTagCustom =
-                                                        mTagCustom
-                                                    doForAll = mDoForAll
-
-                                                    val mergedName =
-                                                        mergeContactValues(
-                                                            existingUser.name,
-                                                            name,
-                                                            overrideName,
-                                                            ""
-                                                        )
-                                                    val mergedDetails =
-                                                        mergeContactValues(
-                                                            existingUser.details,
-                                                            details,
-                                                            overrideDetail,
-                                                            ""
-                                                        )
-                                                    val mergedTag =
-                                                        overrideTagCustom.ifEmpty {
-                                                            combineTags(
-                                                                existingUser.tag,
-                                                                tag
-                                                            )
-                                                        }
-                                                    val mergedRank =
-                                                        mergeContactValues(
-                                                            existingUser.ranking,
-                                                            rank,
-                                                            overrideRanking
-                                                        )
-                                                    dbHelper.insertContact(
-                                                        Contact(
-                                                            name = mergedName,
-                                                            phoneNumber = existingUser.phoneNumber,
-                                                            details = mergedDetails,
-                                                            tag = mergedTag,
-                                                            ranking = mergedRank
-                                                        )
-                                                    )
-                                                    modifiedSize++
-                                                    insertContact(
-                                                        rows,
-                                                        index + 1,
-                                                        dialog,
-                                                        dbHelper
-                                                    )
-
-                                                }
-                                                else {
-                                                    insertContact(
-                                                        rows,
-                                                        rows.size,
-                                                        dialog,
-                                                        dbHelper
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                }).show()
-                        }
                     }
                 } else {
-                    dbHelper.insertContact(
-                        Contact(
-                            name = name ?: "",
-                            phoneNumber = phoneNumber,
-                            lastContact = null,
-                            details = details ?: "",
-                            tag = tag ?: "untagged",
-                            ranking = rank
-                        )
-                    )
-                    newSize++
                     insertContact(
                         rows,
                         index + 1,
@@ -525,7 +564,16 @@ class MainActivity : ComponentActivity() {
                         dbHelper
                     )
                 }
+            } else {
+                insertContact(
+                    rows,
+                    index + 1,
+                    dialog,
+                    dbHelper
+                )
             }
+        } catch (e:Exception){
+            Toast.makeText(this, "Aborting import. Error${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -598,23 +646,22 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun importOptions() {
-        pickFile()
-//        DialogBottomSheet(
-//            this,
-//            getString(R.string.dialog_import_title),
-//            getString(R.string.dialog_import_desc),
-//            getString(R.string.dialog_import_file),
-//            getString(R.string.dialog_import_restore),
-//            true,
-//            R.color.colorError,
-//            object : DialogBottomSheet.DialogListener {
-//                override fun onGo(isGo: Boolean) {
-//                    if (isGo) {
-//
-//                    } else {
-//                    }
-//                }
-//            }).show()
+        DialogBottomSheet(
+            this,
+            getString(R.string.dialog_import_title),
+            getString(R.string.dialog_import_desc),
+            getString(R.string.dialog_import_cancel),
+            getString(R.string.dialog_import_file),
+            false,
+            R.color.colorAccent,
+            object : DialogBottomSheet.DialogListener {
+                override fun onGo(isGo: Boolean) {
+                    if (isGo) {
+                        pickFile()
+                    }
+                }
+            }).show()
+
     }
 
     private fun pickFile(){
@@ -693,7 +740,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun mergeContactValues(old: String?, new: String?, override: Boolean, defaultValue: String): String =
+    private fun mergeContactInfo(old: String?, new: String?, override: Boolean, defaultValue: String): String =
         when {
             !old.isNullOrBlank() && !new.isNullOrBlank() -> if (override) new else old
             !new.isNullOrBlank() -> new
@@ -701,15 +748,21 @@ class MainActivity : ComponentActivity() {
             else -> defaultValue
         }
 
-    private fun mergeContactValues(old: Int, new: Int, override: Boolean): Int =
+    private fun mergeContactInfo(old: Long, new: Long, override: Boolean): Long =
         when {
-            old == 0 && new == 0 -> 0
-            old != 0 && new != 0 -> if (override) new else old
-            else -> if (new != 0) new else old
+            old == 0L && new == 0L -> 0
+            old != 0L && new != 0L -> if (override) new else old
+            else -> if (new != 0L) new else old
         }
 
-    private fun combineTags(existingTag: String?, newTag: String?): String {
+    private fun combineTags(
+        existingTag: String?,
+        newTag: String?,
+        overrideTag: Boolean,
+        customTag: String
+    ): String {
         return when {
+            overrideTag && customTag.isNotEmpty() -> customTag
             existingTag.isNullOrEmpty() && newTag.isNullOrEmpty() -> ""  // Both values are empty or null
             existingTag.isNullOrEmpty() -> newTag.orEmpty()  // Only existingTag is empty or null
             newTag.isNullOrEmpty() -> existingTag  // Only newTag is empty or null

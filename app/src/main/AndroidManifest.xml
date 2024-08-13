@@ -55,7 +55,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTop"
             android:taskAffinity="com.qedron.gateway"
             android:theme="@style/AppTheme">
             <intent-filter>

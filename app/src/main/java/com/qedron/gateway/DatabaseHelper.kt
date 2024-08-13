@@ -4,9 +4,9 @@ interface DatabaseHelper {
 
     suspend fun getAllContacts(): List<ContactWithMessages>
 
-    suspend fun searchPaginatedContacts(searchText: String, offset: Int, limit: Int, order:String, sortBy: String): List<ContactWithMessages>
+    suspend fun searchPaginatedContacts(searchText: String, offset: Int, limit: Int, order:String, sortBy: String, isTest: Boolean): List<ContactWithMessages>
 
-    suspend fun searchCountContacts(searchText: String): Int
+    suspend fun searchCountContacts(searchText: String, isTest: Boolean): Int
 
     fun getAllUniqueTags(): List<String>
 
@@ -44,6 +44,8 @@ interface DatabaseHelper {
     suspend fun countContacts(isTest: Boolean):Int
 
     suspend fun deleteAllContacts()
+
+    suspend fun deleteContactsByTags(tags: List<String>)
 
     suspend fun insertMessage(message: Message)
 

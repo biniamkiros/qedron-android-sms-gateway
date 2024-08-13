@@ -10,8 +10,7 @@ class ContactsViewModelFactory(private val context: Context) : ViewModelProvider
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ContactsViewModel::class.java)) {
-
-            return ContactsViewModel(
+            return ContactsViewModel(context,
                dbHelper = DatabaseHelperImpl(ContactDatabase.getDatabase(context))
             ) as T
         }

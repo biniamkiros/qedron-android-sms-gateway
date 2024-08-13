@@ -29,6 +29,7 @@ import com.qedron.gateway.EndlessRecyclerViewScrollListener
 import com.qedron.gateway.R
 import com.qedron.gateway.afterTextChanged
 import com.qedron.gateway.databinding.FragmentContactsBinding
+import com.qedron.gateway.formattedNumber
 
 
 class ContactsFragment : Fragment() {
@@ -230,7 +231,7 @@ class ContactsFragment : Fragment() {
         }
         viewModel.getContactsCount("")
         viewModel.contactCount.observe(viewLifecycleOwner) { it ->
-            (activity as ContactsActivity).supportActionBar?.subtitle = "$it contacts"
+            (activity as ContactsActivity).supportActionBar?.subtitle = "${it.formattedNumber()} contacts"
         }
 
         if(contactsAdapter.itemCount > 0){
