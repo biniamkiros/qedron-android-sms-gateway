@@ -764,10 +764,11 @@ class MainActivity : ComponentActivity() {
         return when {
             overrideTag && customTag.isNotEmpty() -> customTag
             existingTag.isNullOrEmpty() && newTag.isNullOrEmpty() -> ""  // Both values are empty or null
-            existingTag.isNullOrEmpty() -> newTag.orEmpty()  // Only existingTag is empty or null
-            newTag.isNullOrEmpty() -> existingTag  // Only newTag is empty or null
-            existingTag == newTag -> existingTag  // Both values are the same (or both null)
-            else -> "${existingTag}, $newTag"  // Both values are non-empty (or one is null)
+            else -> existingTag.orEmpty()
+//            existingTag.isNullOrEmpty() -> newTag.orEmpty()  // Only existingTag is empty or null
+//            newTag.isNullOrEmpty() -> existingTag  // Only newTag is empty or null
+//            existingTag == newTag -> existingTag  // Both values are the same (or both null)
+//            else -> "${existingTag}, $newTag"  // Both values are non-empty (or one is null)
         }
     }
 }

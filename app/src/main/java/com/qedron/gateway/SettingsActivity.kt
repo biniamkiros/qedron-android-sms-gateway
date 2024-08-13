@@ -148,9 +148,7 @@ class SettingsActivity : AppCompatActivity() {
                         context?.let { it1 ->
                             val dbHelper =
                                 DatabaseHelperImpl(ContactDatabase.getDatabase(it1))
-                            dbHelper.deleteAllContacts()
                             dbHelper.insertAll(GatewayServiceUtil.generateTestContacts(it1))
-
                             withContext(Dispatchers.Main) {
                                 Toast.makeText(
                                     it1,"Generated 1000 test contacts",

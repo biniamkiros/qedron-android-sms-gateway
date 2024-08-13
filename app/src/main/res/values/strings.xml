@@ -24,7 +24,7 @@
     <string name="limit_summary_off">The number of sms messages a contact receives is unrestricted</string>
 
 <!--    seed Preference-->
-    <string name="seed_title">Seed contacts</string>
+    <string name="seed_title">Seed test contacts</string>
     <string name="seed_summary">Contacts generated will be used for testing purposes</string>
 
     <!-- prefix Preferences -->
