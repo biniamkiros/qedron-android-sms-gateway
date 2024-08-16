@@ -116,10 +116,6 @@ fun Int.dpToPx(): Int {
     return (this * scale + 0.5f).toInt()
 }
 
-fun String.isStringNumeric() :Boolean {
-    return toIntOrNull() != null
-}
-
 fun Context.isServiceRunning(serviceClass: Class<*>): Boolean {
     val activityManager = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     @Suppress("DEPRECATION")

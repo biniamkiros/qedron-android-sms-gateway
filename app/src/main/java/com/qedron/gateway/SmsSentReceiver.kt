@@ -6,8 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.telephony.SmsManager
 import android.util.Log
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStore
 
 class SmsSentReceiver : BroadcastReceiver() {
 
