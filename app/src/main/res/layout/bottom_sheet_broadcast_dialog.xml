@@ -150,11 +150,11 @@
                 app:layout_constraintTop_toBottomOf="@id/dialogContactCount">
 
                 <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:imeOptions="actionNext"
-                        android:inputType="textMultiLine"
-                        android:maxLines="10"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionNext"
+                    android:inputType="textMultiLine"
+                    android:maxLines="100"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 

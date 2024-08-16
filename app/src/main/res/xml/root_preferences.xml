@@ -12,7 +12,7 @@
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="1000"
+            app:defaultValue="5000"
             app:entries="@array/delay_entries"
             app:entryValues="@array/delay_values"
             app:key="delay"
@@ -23,6 +23,59 @@
             app:key="time_range"
             app:title="Set broadcast time"
             app:summary="Prevent sending sms messages in an inconvenient time." />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/error_header">
+        <SwitchPreferenceCompat
+            app:key="abort"
+            app:defaultValue="false"
+            app:title="@string/abort_title"
+            app:summaryOff="@string/abort_summary_off"
+            app:summaryOn="@string/abort_summary_on"/>
+
+        <ListPreference
+            app:key="pause"
+            app:defaultValue="10000"
+            app:entries="@array/delay_entries"
+            app:entryValues="@array/delay_values"
+            app:title="@string/delay_on_error_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="error_limit"
+            app:defaultValue="10"
+            app:entries="@array/error_entries"
+            app:entryValues="@array/error_values"
+            app:title="@string/error_limit_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/contacts_header">
+
+        <SwitchPreferenceCompat
+            app:key="live"
+            app:defaultValue="false"
+            app:title="@string/live_title"
+            app:summaryOff="@string/live_summary_off"
+            app:summaryOn="@string/live_summary_on"/>
+
+        <EditTextPreference
+            app:key="test_prefix"
+            app:defaultValue="+000"
+            app:title="@string/prefix_title"
+            app:summary="@string/prefix_summary"
+            />
+
+        <Preference app:key="seed"
+            app:title="@string/seed_title"
+            app:summary="@string/seed_summary"/>
+
+        <Preference
+            app:key="remove"
+            app:title="@string/remove_title"
+            app:summary="@string/remove_summary" />
 
     </PreferenceCategory>
 
@@ -54,34 +107,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/contacts_header">
-
-        <SwitchPreferenceCompat
-            app:key="live"
-            app:defaultValue="false"
-            app:title="@string/live_title"
-            app:summaryOff="@string/live_summary_off"
-            app:summaryOn="@string/live_summary_on"/>
-
-        <EditTextPreference
-            app:key="test_prefix"
-            app:defaultValue="987"
-            app:title="@string/prefix_title"
-            app:summary="@string/prefix_summary"
-            />
-
-        <Preference app:key="seed"
-            app:title="@string/seed_title"
-            app:summary="@string/seed_summary"/>
-
-        <Preference
-            app:key="remove"
-            app:title="@string/remove_title"
-            app:summary="@string/remove_summary" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/contacts_header">
+    <PreferenceCategory app:title="@string/database_header">
 
         <Preference
             app:key="backup"

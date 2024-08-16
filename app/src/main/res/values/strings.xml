@@ -6,18 +6,31 @@
     <!-- Preference Titles -->
     <string name="frequency_header">Frequency</string>
     <string name="max_header">Max messages</string>
+    <string name="error_header">Errors</string>
     <string name="contacts_header">Contacts</string>
     <string name="database_header">Database</string>
 
     <!-- Messages Preferences -->
     <string name="frequency_title">Hot contact duration</string>
     <string name="delay_title">Broadcast gap between messages</string>
+    <string name="delay_on_error_title">Pause broadcast time after error</string>
+
+    <!-- error limit -->
+    <string name="error_limit_title">Generic error limit to abort broadcasting</string>
+
+    <!-- Abort Preferences -->
+    <string name="abort_title">Abort broadcast on error</string>
+    <string name="abort_summary_on">Broadcast will be aborted, as soon as an error is encountered.</string>
+    <string name="abort_summary_off">Broadcast will resume after user set delay when an error is encountered</string>
+
 
     <!-- Bulk Preferences -->
     <string name="bulk_title">Maximum allowed messages per broadcast</string>
 
     <!-- Max Preferences -->
     <string name="max_title">Lifetime sms message per person</string>
+
+    <!-- Limit Preferences -->
     <string name="limit_title">Limit lifetime messages per person</string>
     <string name="limit_summary_on">A person is excluded from broadcast list after a contact has received a maximum sms messages
     </string>
@@ -129,6 +142,9 @@
     <string name="hours">%1$s ሰዓት</string>
     <string name="minutes">%1$s ደቂቃ</string>
     <string name="seconds">%1$s ሰከንድ</string>
+    <string name="billions">%1$s bl</string>
+    <string name="millions">%1$s ml</string>
+    <string name="thousand">%1$s k</string>
     <string name="sort_by">Sort by</string>
     <string name="order_by">Order by</string>
     <string name="by_tag">by tag</string>

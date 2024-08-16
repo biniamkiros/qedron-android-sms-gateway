@@ -1,6 +1,7 @@
 package com.qedron.gateway
 
 import android.app.ActivityManager
+import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -14,6 +15,8 @@ import android.os.Looper
 import android.telephony.SmsManager
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStore
 import androidx.preference.PreferenceManager
 import java.io.File
 import java.text.SimpleDateFormat
@@ -246,14 +249,14 @@ object GatewayServiceUtil {
         val companies = listOf("xyz", "abc", "x", "lmnop", "orange")
         val companyTypes = listOf("F.C.", "College", "Real estate", "Corp", "Construction", "PLC", "S.C.")
         val title = listOf("manager", "owner", "admin", "VP", "CEO", "HR", "Lead dev")
-        val tags = listOf("leads", "customers", "prospects")
+        val tags = listOf("test leads", "test customers", "test prospects")
 
-        val prefix = PreferenceManager.getDefaultSharedPreferences(context).getString("test_prefix","987")
+        val prefix = PreferenceManager.getDefaultSharedPreferences(context).getString("test_prefix","+000")
         val contacts = mutableListOf<Contact>()
         for (i in 1..1000) {
             contacts.add(Contact(
                 name = "${name.random()} ${mNames.random()}",
-                phoneNumber = "$prefix${i.toString().padStart(8, '0')}",
+                phoneNumber = "$prefix${i.toString().padStart(9, '0')}",
                 details = "${title.random()} at ${companies.random()} ${companyTypes.random()}",
                 tag =  tags.random(),
                 ranking = Random.nextLong(10, 10001) * 1000,
@@ -286,5 +289,35 @@ object GatewayServiceUtil {
             ).show()
             return null
         }
+    }
+
+    fun reportGenericBroadcastError(context: Context){
+        val appViewModelStore: ViewModelStore by lazy {
+            (context.applicationContext as App).viewModelStore
+        }
+        val viewModel: BroadcastViewModel by lazy {
+            ViewModelProvider(
+                appViewModelStore,
+                ViewModelProvider.AndroidViewModelFactory(context.applicationContext as Application)
+            )[BroadcastViewModel::class.java]
+        }
+
+        viewModel.addGenericBroadcastError()
+
+    }
+
+    fun errorOnBroadcast(context: Context){
+        val appViewModelStore: ViewModelStore by lazy {
+            (context.applicationContext as App).viewModelStore
+        }
+        val viewModel: BroadcastViewModel by lazy {
+            ViewModelProvider(
+                appViewModelStore,
+                ViewModelProvider.AndroidViewModelFactory(context.applicationContext as Application)
+            )[BroadcastViewModel::class.java]
+        }
+
+        viewModel.errorOnBroadcast()
+
     }
 }

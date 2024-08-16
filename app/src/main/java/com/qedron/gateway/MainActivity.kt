@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
+import android.telephony.PhoneNumberUtils
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.widget.TextView
@@ -202,6 +203,7 @@ class MainActivity : ComponentActivity() {
             when(status){
                 BroadcastViewModel.ONGOING -> startBroadcastService()
                 BroadcastViewModel.ABORTED,
+                BroadcastViewModel.FAILED,
                 BroadcastViewModel.KILLED,
                 BroadcastViewModel.CLEARED,
                 BroadcastViewModel.COMPLETED -> stopBroadcastService()
@@ -387,9 +389,8 @@ class MainActivity : ComponentActivity() {
                     val update = "processing ${index + 1}/${rows.size} contacts..."
                     dialog.findViewById<TextView>(R.id.progress_msg).text = update
                 }
-                val phoneNumber = "0${phone.takeLast(9).trim()}"
-                if (phoneNumber.length > 9 && phoneNumber.isStringNumeric()) {
-                    val existingUser = dbHelper.getContactByPhone(phoneNumber)
+                if (PhoneNumberUtils.isGlobalPhoneNumber(phone)) {
+                    val existingUser = dbHelper.getContactByPhone(phone)
                     if (existingUser != null) {
                         if (doForAll) {
                             val mergedName =
@@ -543,7 +544,7 @@ class MainActivity : ComponentActivity() {
                             Contact(
                                 name = name,
                                 details = details,
-                                phoneNumber = phoneNumber,
+                                phoneNumber = phone,
                                 tag = tag,
                                 ranking = rank
                             )
@@ -557,6 +558,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 } else {
+                    Log.e("Import contacts","invalid phone number $phone. skipping.")
                     insertContact(
                         rows,
                         index + 1,

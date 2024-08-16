@@ -47,6 +47,27 @@
         <item>60000</item>
     </string-array>
 
+    <!-- Delay Preference -->
+    <string-array name="error_entries">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>50</item>
+        <item>100</item>
+        <item>500</item>
+        <item>1000</item>
+    </string-array>
+
+    <string-array name="error_values">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>50</item>
+        <item>100</item>
+        <item>500</item>
+        <item>1000</item>
+    </string-array>
+
     <!-- Max Preference -->
     <string-array name="max_entries">
         <item>10 messages</item>
@@ -81,6 +102,7 @@
     <string-array name="bulk_values">
         <item>10</item>
         <item>50</item>
+        <item>100</item>
         <item>500</item>
         <item>1000</item>
         <item>5000</item>

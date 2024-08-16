@@ -1,7 +1,9 @@
 package com.qedron.gateway
 
 class DatabaseHelperImpl(private val contactDatabase: ContactDatabase) : DatabaseHelper {
-    override suspend fun getAllContacts(): List<ContactWithMessages> = contactDatabase.contactDao().getAllContacts()
+    override suspend fun getAllContactsWithMessages(): List<ContactWithMessages> = contactDatabase.contactDao().getAllContactsWithMessages()
+
+    override suspend fun getAllContacts(): List<Contact> = contactDatabase.contactDao().getAllContacts()
 
     override suspend fun searchPaginatedContacts(searchText: String, offset: Int, limit: Int, order:String, sortBy: String, isTest: Boolean): List<ContactWithMessages> = contactDatabase.contactDao().searchPaginatedContacts(searchText, offset, limit, order, sortBy, isTest)
 
@@ -11,14 +13,20 @@ class DatabaseHelperImpl(private val contactDatabase: ContactDatabase) : Databas
 
     override fun getMinAndMaxRanking()= contactDatabase.contactDao().getMinAndMaxRanking()
 
+    override suspend fun getFreshFilteredLimitedTopRankings(
+        tags: List<String>,
+        tagsSize: Int,
+        isTest: Boolean
+    ): List<Long> = contactDatabase.contactDao().getFreshFilteredLimitedTopRankings(tags, tagsSize, isTest)
+
     override suspend fun getFreshFilteredLimitedTopContacts(
-        days: Int,
+        days: Long,
         maxMsg: Int,
         limit: Int,
         tags: List<String>,
         tagsSize: Int,
-        minRank: Int,
-        maxRank: Int,
+        minRank: Long,
+        maxRank: Long,
         isTest: Boolean
     )= contactDatabase.contactDao().getFreshFilteredLimitedTopContacts(days, maxMsg, limit, tags, tagsSize, minRank, maxRank, isTest)
 

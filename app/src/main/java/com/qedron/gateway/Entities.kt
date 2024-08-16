@@ -52,7 +52,8 @@ data class ContactWithMessages(
 )
 
 data class MinMaxRanking(
-    val minRanking: Int,
-    val maxRanking: Int
+    val minRanking: Long,
+    val avgRanking: Long,
+    val maxRanking: Long
 )
 

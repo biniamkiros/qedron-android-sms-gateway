@@ -14,6 +14,7 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import com.qedron.gateway.BroadcastViewModel.Companion.ABORTED
+import com.qedron.gateway.BroadcastViewModel.Companion.FAILED
 import com.qedron.gateway.BroadcastViewModel.Companion.CLEARED
 import com.qedron.gateway.BroadcastViewModel.Companion.COMPLETED
 import com.qedron.gateway.BroadcastViewModel.Companion.INITIATED
@@ -56,6 +57,7 @@ class BroadcastService() : LifecycleService() {
                 STARTED,
                 KILLED,
                 ABORTED,
+                FAILED,
                 CLEARED,
                 COMPLETED -> stopService()
                 else -> stopService()

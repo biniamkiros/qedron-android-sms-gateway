@@ -6,10 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.telephony.SmsManager
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStore
 
 class SmsSentReceiver : BroadcastReceiver() {
+
     private val tag = "TRACK_SMS_STATUS"
     override fun onReceive(context: Context, intent: Intent) {
+
         when (resultCode) {
             Activity.RESULT_OK -> {
                 Log.d(tag, "SMS sent")
@@ -23,6 +27,7 @@ class SmsSentReceiver : BroadcastReceiver() {
                 )
                 GatewayServiceUtil.setStat(context,last="error - generic failure")
                 GatewayServiceUtil.notifyStat(context)
+                GatewayServiceUtil.reportGenericBroadcastError(context)
             }
             SmsManager.RESULT_ERROR_NO_SERVICE -> {
                 Log.d(tag, "No service")
@@ -31,6 +36,7 @@ class SmsSentReceiver : BroadcastReceiver() {
                 )
                 GatewayServiceUtil.setStat(context,last="error - no service to")
                 GatewayServiceUtil.notifyStat(context)
+                GatewayServiceUtil.errorOnBroadcast(context)
             }
             SmsManager.RESULT_ERROR_NULL_PDU -> {
                 Log.d(tag, "Null PDU")
@@ -39,6 +45,7 @@ class SmsSentReceiver : BroadcastReceiver() {
                 )
                 GatewayServiceUtil.setStat(context,last="error - null PDU")
                 GatewayServiceUtil.notifyStat(context)
+                GatewayServiceUtil.errorOnBroadcast(context)
             }
             SmsManager.RESULT_ERROR_RADIO_OFF -> {
                 Log.d(tag, "Radio off")
@@ -47,6 +54,7 @@ class SmsSentReceiver : BroadcastReceiver() {
                 )
                 GatewayServiceUtil.setStat(context,last="error - radio off")
                 GatewayServiceUtil.notifyStat(context)
+                GatewayServiceUtil.errorOnBroadcast(context)
             }
         }
     }

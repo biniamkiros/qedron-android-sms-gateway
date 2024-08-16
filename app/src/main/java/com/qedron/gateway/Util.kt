@@ -78,6 +78,17 @@ fun Date?.formattedLastContactTimeElapsed(context: Context, defaultText:String):
     return "ከተላከ $duration ሆኖታል"
 }
 
+fun Float?.formattedAmount(context: Context, defaultText:String, prefix: String):String {
+    if (this == null) return defaultText
+    val duration = when {
+        this > 1000000000 -> String.format(context.getString(R.string.billions), (this/1000000000).formattedDecimal(prefix))
+        this > 1000000 -> String.format(context.getString(R.string.millions), (this/1000000).formattedDecimal(prefix))
+        this > 1000 -> String.format(context.getString(R.string.thousand), (this/1000).formattedDecimal(prefix))
+        else -> this.formattedNumber(prefix)// "%02d".format(seconds))
+    }
+    return duration
+}
+
 fun Date?.formattedDate(defaultText:String):String {
     if (this == null) return defaultText
     return  SimpleDateFormat("E, d MMM yy", Locale.getDefault()).format(this.time)
@@ -90,6 +101,15 @@ fun Int?.formattedNumber(prefix:String = ""):String {
 fun Long?.formattedNumber(prefix:String = ""):String {
     return prefix + DecimalFormat("#,###").format(this)
 }
+
+fun Float?.formattedNumber(prefix:String = ""):String {
+    return prefix + DecimalFormat("#,###").format(this)
+}
+
+fun Float?.formattedDecimal(prefix:String = ""):String {
+    return prefix + DecimalFormat("#,###.#").format(this)
+}
+
 
 fun Int.dpToPx(): Int {
     val scale = Resources.getSystem().displayMetrics.density
@@ -121,5 +141,7 @@ fun String?.getGlanceText(length: Int):String {
 }
 
 fun String?.toRanking() :Long {
-    return this?.toDoubleOrNull()?.toLong() ?: 0L
+    return if(this == null) 0L
+    else if(this.length > 18) Long.MAX_VALUE
+    else this.toDoubleOrNull()?.toLong() ?: 0L
 }

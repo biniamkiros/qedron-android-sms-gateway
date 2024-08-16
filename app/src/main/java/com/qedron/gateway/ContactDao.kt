@@ -23,6 +23,9 @@ interface ContactDao {
     @Delete
     suspend fun delete(contact: Contact)
 
+    @Query("SELECT * FROM contacts")
+    fun getAllContacts(): List<Contact>
+
     @Query("SELECT * FROM contacts WHERE id = :contactId")
     suspend fun getContactById(contactId: Long): Contact?
 
@@ -30,7 +33,8 @@ interface ContactDao {
     suspend fun getContactByPhone(phone: String): Contact?
 
     @Query("SELECT contacts.*, COUNT(messages.id) AS messageCount FROM contacts LEFT JOIN messages ON contacts.id = messages.contactId")
-    fun getAllContacts(): List<ContactWithMessages>
+    fun getAllContactsWithMessages(): List<ContactWithMessages>
+
 
     @Query("SELECT * FROM contacts WHERE lastContact <= date('now',:days +'day') OR lastContact IS NULL ")
     fun getFreshContacts(days: Int): List<Contact>
@@ -61,14 +65,14 @@ interface ContactDao {
     @Query("SELECT DISTINCT tag FROM contacts")
     fun getAllUniqueTags(): List<String>
 
-    @Query("SELECT MIN(ranking) AS minRanking, MAX(ranking) AS maxRanking FROM contacts")
+    @Query("SELECT MIN(ranking) AS minRanking, AVG(ranking) AS avgRanking, MAX(ranking) AS maxRanking FROM contacts")
     fun getMinAndMaxRanking(): MinMaxRanking
 
     @Transaction
     @Query(
         """
     SELECT * FROM contacts 
-    WHERE (lastContact <= date('now', :days || ' day') OR lastContact IS NULL) AND isTest = :isTest 
+    WHERE (lastContact IS NULL  OR lastContact < (1000 * strftime('%s', datetime('now', :days || ' day')))) AND isTest = :isTest 
     AND (id IN (
         SELECT contactId 
         FROM messages 
@@ -86,15 +90,29 @@ interface ContactDao {
     """
     )
     fun getFreshFilteredLimitedTopContacts(
-        days: Int,
+        days: Long,
         maxMsg: Int,
         limit: Int,
         tags: List<String> = emptyList(),
         tagsSize: Int = tags.size,
-        minRank: Int = 0,
-        maxRank: Int = Int.MAX_VALUE,
+        minRank: Long = 0,
+        maxRank: Long = Long.MAX_VALUE,
         isTest: Boolean
     ): List<Contact>
+
+    @Transaction
+    @Query(
+        """
+    SELECT ranking FROM contacts 
+    WHERE isTest = :isTest 
+    AND (:tagsSize = 0 OR tag IN (:tags))
+    """
+    )
+    fun getFreshFilteredLimitedTopRankings(
+        tags: List<String> = emptyList(),
+        tagsSize: Int = tags.size,
+        isTest: Boolean
+    ): List<Long>
 
     @Query(
         """

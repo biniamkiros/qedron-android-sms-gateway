@@ -2,7 +2,9 @@ package com.qedron.gateway
 
 interface DatabaseHelper {
 
-    suspend fun getAllContacts(): List<ContactWithMessages>
+    suspend fun getAllContacts(): List<Contact>
+
+    suspend fun getAllContactsWithMessages(): List<ContactWithMessages>
 
     suspend fun searchPaginatedContacts(searchText: String, offset: Int, limit: Int, order:String, sortBy: String, isTest: Boolean): List<ContactWithMessages>
 
@@ -12,14 +14,20 @@ interface DatabaseHelper {
 
     fun getMinAndMaxRanking(): MinMaxRanking
 
+    suspend fun getFreshFilteredLimitedTopRankings(
+        tags: List<String> = emptyList(),
+        tagsSize: Int = tags.size,
+        isTest: Boolean
+    ): List<Long>
+
     suspend fun getFreshFilteredLimitedTopContacts(
-        days: Int,
+        days: Long,
         maxMsg: Int,
         limit: Int,
         tags: List<String> = emptyList(),
         tagsSize: Int = tags.size,
-        minRank: Int = 0,
-        maxRank: Int = Int.MAX_VALUE,
+        minRank: Long = 0,
+        maxRank: Long = Long.MAX_VALUE,
         isTest: Boolean
     ): List<Contact>
 

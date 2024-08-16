@@ -16,6 +16,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.preference.PreferenceManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.slider.RangeSlider
 import com.google.android.material.textfield.TextInputLayout
@@ -76,6 +77,12 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
         viewModel.error.observe(this){ showBroadcastReady() }
 
         handleStatusChange(viewModel.status.value)
+
+        initRangeTagModeCount()
+
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+
     }
 
     private fun handleStatusChange(status: String?) {
@@ -84,6 +91,7 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
             BroadcastViewModel.INITIATED -> showBroadcastReady()
             BroadcastViewModel.ONGOING -> showBroadcastStart()
             BroadcastViewModel.ABORTED,
+            BroadcastViewModel.FAILED,
             BroadcastViewModel.KILLED,
             BroadcastViewModel.CLEARED,
             BroadcastViewModel.COMPLETED -> showBroadcastDone()
@@ -93,6 +101,7 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
     private fun handleCancel(){
         when(viewModel.status.value){
             BroadcastViewModel.ABORTED,
+            BroadcastViewModel.FAILED,
             BroadcastViewModel.COMPLETED,
             BroadcastViewModel.INITIATED -> {
                 dismiss()
@@ -120,36 +129,12 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
 
     private fun showBroadcastReady() {
         if (viewModel.status.value == BroadcastViewModel.ABORTED
+            || viewModel.status.value == BroadcastViewModel.FAILED
             || viewModel.status.value == BroadcastViewModel.ONGOING
             || viewModel.status.value == BroadcastViewModel.COMPLETED)
             return
         val error = viewModel.error.value?:""
-        val tags = viewModel.tags
-        val selectedTags = viewModel.selectedTags
-            dialogContactCount?.text =
-                context.getString(R.string.contacts_available, viewModel.contacts.size, viewModel.count)
-        tagsBtn?.text = if (viewModel.selectedTags.isEmpty() || tags.sorted() == selectedTags.sorted()) {
-            "all tags"
-        } else {
-            selectedTags.joinToString(", ") { it.ifEmpty { "untagged" } }
-                .let {
-                    if (it.length > 14) it.take(14) + "..." else it
-                }
-        }
-
-        val minMax = viewModel.minMaxRanking
-        rangeBtn?.text = viewModel.selectedMinMaxRanking.let { if(it.minRanking > minMax.minRanking
-            || it.maxRanking < minMax.maxRanking) "$${it.minRanking} - $${it.maxRanking}" else "full range" }
-
-         if(viewModel.isLive) {
-             modeTxt?.text = context.getString(R.string.live)
-             modeTxt?.setTextColor(context.getColor(R.color.colorLive))
-             modeTxt?.background =  AppCompatResources.getDrawable(context,R.drawable.live_text_background)
-         } else {
-             modeTxt?.text = context.getString(R.string.test)
-             modeTxt?.setTextColor(context.getColor(R.color.colorTest))
-             modeTxt?.background = AppCompatResources.getDrawable(context,R.drawable.test_text_background)
-         }
+        initRangeTagModeCount()
         buttonCancel?.text = context.getString(R.string.abort)
         dialogSuccessMsg?.visibility = View.GONE
         dialogSuccessMsg?.text = context.getString(R.string.fetching_result)
@@ -165,6 +150,42 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
             buttonGo?.visibility = View.GONE
             dialogLayoutProgress?.visibility = View.GONE
         }
+    }
+
+    private fun initRangeTagModeCount() {
+        val tags = viewModel.tags
+        val selectedTags = viewModel.selectedTags
+
+        tagsBtn?.text =
+            if (viewModel.selectedTags.isEmpty() || tags.sorted() == selectedTags.sorted()) {
+                "all tags"
+            } else {
+                selectedTags.joinToString(", ") { it.ifEmpty { "untagged" } }
+                    .let {
+                        if (it.length > 14) it.take(14) + "..." else it
+                    }
+            }
+
+        val minMax = viewModel.rankings
+        rangeBtn?.text = if (minMax.isEmpty()) "no range" else viewModel.selectedMinMaxRanking.let {
+            if (it.minRanking > minMax.first()
+                || it.maxRanking < minMax.last()
+            ) "$${it.minRanking} - $${it.maxRanking}" else "full range"
+        }
+
+        if (viewModel.isLive) {
+            modeTxt?.text = context.getString(R.string.live)
+            modeTxt?.setTextColor(context.getColor(R.color.colorLive))
+            modeTxt?.background =
+                AppCompatResources.getDrawable(context, R.drawable.live_text_background)
+        } else {
+            modeTxt?.text = context.getString(R.string.test)
+            modeTxt?.setTextColor(context.getColor(R.color.colorTest))
+            modeTxt?.background =
+                AppCompatResources.getDrawable(context, R.drawable.test_text_background)
+        }
+        dialogContactCount?.text =
+            context.getString(R.string.contacts_available, viewModel.contacts.size, viewModel.count)
     }
 
     private fun showBroadcastInitialised() {
@@ -245,44 +266,79 @@ class BroadcastBottomSheet(context: Context, private val dialogListener: DialogL
 
     private fun showRangeMenu(){
         if (viewModel.status.value == BroadcastViewModel.ONGOING) return
-        if (viewModel.minMaxRanking.minRanking < viewModel.minMaxRanking.maxRanking) {
-            val dialogView = layoutInflater.inflate(R.layout.dialog_number_range_slider, null)
-            val rangeSlider = dialogView.findViewById<RangeSlider>(R.id.rangeSlider)
-
-            try {
-                val from = viewModel.minMaxRanking.minRanking.toFloat()
-                val to = viewModel.minMaxRanking.maxRanking.toFloat()
-
-                val min = viewModel.selectedMinMaxRanking.minRanking.toFloat()
-                val max = viewModel.selectedMinMaxRanking.maxRanking.toFloat()
-
-                if (min >= from && max <= to) {
-                    rangeSlider.valueFrom = from
-                    rangeSlider.valueTo = to
-                    rangeSlider.values = listOf(min, max)//if(max.toInt() == 0) to else max)
-
-                    AlertDialog.Builder(context, R.style.AlertDialogCustom)
-                        .setTitle("Select ranking range")
-                        .setView(dialogView)
-                        .setPositiveButton("OK") { dialog, _ ->
-                            with(PreferenceManager.getDefaultSharedPreferences(context).edit()) {
-                                putInt("minRank", rangeSlider.values[0].toInt())
-                                putInt("maxRank", rangeSlider.values[1].toInt())
-                                apply()
-                            }
-                            viewModel.initBroadCast()
-                            dialog.dismiss()
-                        }
-                        .create()
-                        .show()
-                } else {
-                    Log.e("RangeSlider", "Selected values are out of bounds min:$min >= from:$from max:$max <= to:$to")
+        if (viewModel.rankings.isNotEmpty()) {
+            if (viewModel.rankings.first() < viewModel.rankings.last()) {
+                val dialogView = layoutInflater.inflate(R.layout.dialog_number_range_slider, null)
+                val rangeSlider = dialogView.findViewById<RangeSlider>(R.id.rangeSlider)
+                rangeSlider.setLabelFormatter { value ->
+                    Log.e("WWWWW", "$value ${viewModel.findRankingForPercentile(value)}")
+                    viewModel.findRankingForPercentile(value).toFloat()
+                        .formattedAmount(context, "$0", "$")
                 }
-            } catch (e: Exception) {
-                Log.e("RangeSlider", "Error setting up RangeSlider", e)
+
+                try {
+                    val from =
+                        viewModel.findPercentileForRanking(viewModel.rankings.first()).toFloat()
+                    val to = viewModel.findPercentileForRanking(viewModel.rankings.last()).toFloat()
+
+                    val min =
+                        viewModel.findPercentileForRanking(viewModel.selectedMinMaxRanking.minRanking)
+                            .toFloat()
+                    val max =
+                        viewModel.findPercentileForRanking(viewModel.selectedMinMaxRanking.maxRanking)
+                            .toFloat()
+
+                    if (min >= from && max <= to) {
+                        rangeSlider.valueFrom = from
+                        rangeSlider.valueTo = to
+                        rangeSlider.values = listOf(min, max)//if(max.toInt() == 0) to else max)
+                        Log.e(
+                            "MMMMMMm",
+                            "first: ${viewModel.rankings.first()} last:${viewModel.rankings.last()}"
+                        )
+
+                        AlertDialog.Builder(context, R.style.AlertDialogCustom)
+                            .setTitle("Select ranking range")
+                            .setView(dialogView)
+                            .setPositiveButton("OK") { dialog, _ ->
+                                with(
+                                    PreferenceManager.getDefaultSharedPreferences(context).edit()
+                                ) {
+                                    putLong(
+                                        "minRank",
+                                        viewModel.findRankingForPercentile(rangeSlider.values[0])
+                                    )
+                                    putLong(
+                                        "maxRank",
+                                        viewModel.findRankingForPercentile(rangeSlider.values[1])
+                                    )
+                                    apply()
+                                }
+                                viewModel.initBroadCast()
+                                dialog.dismiss()
+                            }
+                            .create()
+                            .show()
+                    } else {
+                        Log.e(
+                            "RangeSlider",
+                            "Selected values are out of bounds min:$min >= from:$from max:$max <= to:$to"
+                        )
+                    }
+                } catch (e: Exception) {
+                    Log.e("RangeSlider", "Error setting up RangeSlider", e)
+                }
+            } else {
+                Toast.makeText(
+                    context,
+                    "no ranking difference found.${viewModel.let { md -> md.rankings.let { " min:${it.first()} max:${it.listIterator()}" } }}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
+
         } else {
-            Toast.makeText(context, "no ranking difference found.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "no ranking available.", Toast.LENGTH_LONG).show()
         }
     }
+
 }

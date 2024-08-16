@@ -90,13 +90,14 @@ class ContactBottomSheet(context: Context,
             viewModel.updateContact(contact.contact)
         }
 
+        contactMessages?.removeAllViews()
         contact.messages.forEach {
             val textView = TextView(context)
             textView.text = context.getString(
                 R.string.message_with_date,
                 it.timeStamp.formattedDate(context.getString(R.string.unknown_date)),
                 it.message
-            ) // Set the text to the message content
+            )
             textView.setBackgroundResource(R.drawable.message_background) // Set the background drawable
             textView.setPadding(12.dpToPx(), 12.dpToPx(), 12.dpToPx(), 12.dpToPx())
             textView.setTextColor(ContextCompat.getColor(context, R.color.colorTextOnSurface)) // Replace
@@ -109,9 +110,6 @@ class ContactBottomSheet(context: Context,
             contactMessages?.addView(textView)
         }
 
-//        val text =
-//            contact.messages.joinToString("\n\n\n\n") { "${it.timeStamp.formattedDate("unknown date")}\n\n${it.message}" }
-//        contactMessages?.text = text
     }
 }
 

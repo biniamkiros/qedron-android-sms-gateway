@@ -16,6 +16,7 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -62,6 +63,7 @@ class ContactsFragment : Fragment() {
     private val viewModel: ContactsViewModel by viewModels {
         context?.let { ContactsViewModelFactory(it) }!!
     }
+
     interface ContactClickListener {
         fun onBlockButtonClicked(contact: ContactWithMessages)
 
@@ -166,11 +168,23 @@ class ContactsFragment : Fragment() {
     }
 
     private fun reloadData(){
+        with(context?.let { PreferenceManager.getDefaultSharedPreferences(it).edit() }) {
+            this?.putString("orderBy", orderBy)
+            this?.putString("sortBy", sortBy)
+            this?.apply()
+        }
         contactsAdapter.clearData()
         viewModel.searchPaginatedContacts(searchText, 0, initialPerPage, orderBy, sortBy)
     }
 
     private fun initContactsList(){
+        context?.let {
+            PreferenceManager.getDefaultSharedPreferences(it).let {
+                orderBy = it.getString("orderBy", CONTACT_ID)!!
+                sortBy = it.getString("sortBy", ASC)!!
+            }
+        }
+
         binding.contactList.apply {
             val linearLayoutManager = LinearLayoutManager(activity)
             layoutManager = linearLayoutManager

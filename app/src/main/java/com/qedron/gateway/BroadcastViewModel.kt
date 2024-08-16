@@ -1,6 +1,7 @@
 package com.qedron.gateway
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,6 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
 import java.util.Calendar
+import kotlin.math.abs
 import kotlin.math.ceil
 
 class BroadcastViewModel(private val application: Application) : AndroidViewModel(application) {
@@ -21,6 +23,7 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
         const val INITIATED = "initiated"
         const val ONGOING = "ongoing"
         const val ABORTED = "aborted"
+        const val FAILED = "failed"
         const val KILLED = "killed"
         const val CLEARED = "cleared"
         const val COMPLETED = "completed"
@@ -32,16 +35,18 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
     private val smsManager = GatewayServiceUtil.getSmsManager(application)
     private var job: Job? = null
     private var lifeTimeLimit = false
-    private var frequency = -7
+    private var frequency = -7L
     private var maxLifeTimeMessages = 100
     private var carrierLimit = 1000L
     private var top = -1
+    private var sendError =false
+    private var abortOnError =false
+    private var pauseOnError =1000L
 
+    var genericErrorCount = 0
+    var genericErrorLimit = 0
+    var rankings = emptyList<Long>()
     var isMessageModified = false
-        set(value) {
-            field = value
-//            hasBroadcastErrors()
-        }
     var sent = 0
         set(value) {
             field = value
@@ -52,6 +57,7 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
             field = value
             hasBroadcastErrors()
         }
+
     var completed = false
         set(value) {
             field = value
@@ -77,12 +83,12 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
             field = value
             hasBroadcastErrors()
         }
-    var minMaxRanking: MinMaxRanking = MinMaxRanking(0, Int.MAX_VALUE)
+    var minMaxRanking: MinMaxRanking = MinMaxRanking(0,0, Long.MAX_VALUE)
         set(value) {
             field = value
             hasBroadcastErrors()
         }
-    var selectedMinMaxRanking: MinMaxRanking = MinMaxRanking(0, 0)
+    var selectedMinMaxRanking: MinMaxRanking = MinMaxRanking(0, 0, 0)
         set(value) {
             field = value
             hasBroadcastErrors()
@@ -94,7 +100,7 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
             if (status.value != INITIATED) initBroadCast()
         }
 
-    lateinit var contacts: List<Contact>
+    var contacts: List<Contact> = emptyList()
 
     private val _progress = MutableLiveData<String>()
     val progress: LiveData<String> = _progress
@@ -108,6 +114,7 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
     fun initBroadCast() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                genericErrorCount = 0
                 abort = false
                 sent = 0
                 completed = false
@@ -116,17 +123,21 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
                 isLive = preferences.getBoolean("live", false)
                 count = dbHelper.countContacts(!isLive)
                 carrierLimit = preferences.getString("delay", "1000")!!.toLong()
+                genericErrorLimit = preferences.getString("error_limit", "10")!!.toInt()
                 lifeTimeLimit = preferences.getBoolean("limit", false)
-                val minRank = preferences.getInt("minRank", minMaxRanking.minRanking)
-                val maxRank = preferences.getInt("maxRank", minMaxRanking.maxRanking)
+                val minRank = preferences.getLong("minRank", minMaxRanking.minRanking)
+                val maxRank = preferences.getLong("maxRank", minMaxRanking.maxRanking)
                 selectedMinMaxRanking = MinMaxRanking(
                     if(minRank > minMaxRanking.minRanking) minRank else minMaxRanking.minRanking,
+                    0,
                     if (maxRank < minMaxRanking.maxRanking) maxRank else minMaxRanking.maxRanking
                 )
                 selectedTags = preferences.getStringSet("tags", setOf())?.toList()?: emptyList()
-                frequency =  preferences.getString("frequency", "7")!!.toInt() * -1
+                frequency =  preferences.getString("frequency", "7")!!.toLong() * -1
                 maxLifeTimeMessages = preferences.getString("max", "100")!!.toInt()
                 top = preferences.getString("bulk", "-1")!!.toInt()
+                abortOnError = preferences.getBoolean("abort", false)
+                pauseOnError = preferences.getString("pause", "1000")!!.toLong()
                 contacts = dbHelper.getFreshFilteredLimitedTopContacts(frequency,
                     if(lifeTimeLimit) maxLifeTimeMessages else -1,
                     if(top>0) top else count,
@@ -136,6 +147,36 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
                     selectedMinMaxRanking.maxRanking,
                     !isLive)
                 _status.postValue(INITIATED)
+                val now = Calendar.getInstance().timeInMillis
+                contacts.forEach {
+
+                    val isContactHot = if (it.lastContact != null) {
+                        ( - it.lastContact!!.time) < (abs(
+                            frequency
+                        ) * 86400000)
+                    } else false
+
+                    if (isContactHot) {
+                        Log.e(
+                            "MMMMMMMM",
+                            "now $now last:${it.lastContact!!.time} < ${(abs(frequency) * 86400000)} freq:$frequency"
+                        )
+                        Log.e(
+                            "WWWWWWWW", "Contact has received message ${
+                                it.lastContact.formattedTimeElapsed(
+                                    application,
+                                    "never"
+                                )
+                            }. skipping..."
+                        )
+                    }
+                }
+
+                rankings = dbHelper.getFreshFilteredLimitedTopRankings(
+                    selectedTags,
+                    selectedTags.size,
+                    !isLive).distinct().sorted()
+
                 hasBroadcastErrors()
             }
         }
@@ -158,28 +199,47 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
                             "${index + 1}/${contacts.size} sending to ${if (contact.name.isEmpty()) contact.phoneNumber else "${contact.name} - ${contact.phoneNumber}"}"
                         _progress.postValue(progress)
                         delay(ceil((carrierLimit/2).toDouble()).toLong())
-                        val success = GatewayServiceUtil.sendMessage(
-                            application,
-                            smsManager,
-                            contact.phoneNumber,
-                            broadcastMessage
-                        )
-                        if (success) {
-                            count++
-                            val now = Calendar.getInstance().time
-                            contact.lastContact = now
-                            dbHelper.updateContact(contact)
-                            dbHelper.insertMessage(
-                                Message(
-                                    contactId = contact.id,
-                                    message = broadcastMessage,
-                                    timeStamp = now
-                                )
+                        val isContactHot = if (contact.lastContact != null) {
+                            (Calendar.getInstance().timeInMillis - contact.lastContact!!.time) < (abs(frequency) * 86400000)
+                            } else false
+
+                        if(isContactHot) {
+                            _progress.postValue("Contact has received message ${contact.lastContact.formattedTimeElapsed(
+                                application,
+                                "never"
+                            )}. skipping...")
+                        } else {
+                            val success = GatewayServiceUtil.sendMessage(
+                                application,
+                                smsManager,
+                                contact.phoneNumber,
+                                broadcastMessage
                             )
+                            if (success && !sendError) {
+                                count++
+                                val now = Calendar.getInstance().time
+                                contact.lastContact = now
+                                dbHelper.updateContact(contact)
+                                dbHelper.insertMessage(
+                                    Message(
+                                        contactId = contact.id,
+                                        message = broadcastMessage,
+                                        timeStamp = now
+                                    )
+                                )
+                            } else if (abortOnError) {
+                                abort = true
+                                _status.postValue(if (sendError) FAILED else ABORTED)
+                            } else {
+                                _progress.postValue("Error sending sms. Pausing broadcast for $pauseOnError")
+                                delay(pauseOnError)
+                                sendError = false
+                            }
+
+                            progress =
+                                "${index + 1}/${contacts.size} ${if (success) "sms sent" else "error sending"} to ${if (contact.name.isEmpty()) contact.phoneNumber else "${contact.name} - ${contact.phoneNumber}"}"
+                            _progress.postValue(progress)
                         }
-                        progress =
-                            "${index + 1}/${contacts.size} ${if(success) "sms sent" else "error sending"} to ${if (contact.name.isEmpty()) contact.phoneNumber else "${contact.name} - ${contact.phoneNumber}"}"
-                        _progress.postValue(progress)
                     }
                 }
                 sent = count
@@ -205,18 +265,23 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
     }
 
     private fun isBroadcasting(): Boolean {
-        return !abort //&& status.value == ONGOING
+        return !abort//&& status.value == ONGOING
     }
 
     private fun hasBroadcastErrors(): Boolean {
         var error = ""
         if(!isInBroadcastWindow())
             error= application.getString(R.string.broadcast_not_allowed_at_this_hour_go_to_settings)
-        else if (this::contacts.isInitialized && contacts.isEmpty())
+        else if (contacts.isEmpty())
             error= application.getString(R.string.no_available_contacts_go_to_settings)
         else if(broadcastMessage.isEmpty() && isMessageModified)
             error= application.getString(R.string.message_cannot_be_empty)
+        else if(contacts.mapNotNull { it.lastContact }
+                .any { (Calendar.getInstance().timeInMillis - it.time) > (abs(frequency) * 86400000) })
+            error = "Cannot send sms within ${abs(frequency)} days to the same contact"
+
         _error.postValue(error)
+
         return error.isNotEmpty()
     }
 
@@ -225,9 +290,36 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
         _status.postValue(ABORTED)
     }
 
+    fun errorOnBroadcast() {
+        sendError = true
+    }
+
+    fun addGenericBroadcastError() {
+        genericErrorCount++
+        if(genericErrorCount > genericErrorLimit) sendError = true
+    }
+
     fun finishBroadcast() {
         _status.postValue(FINISHED)
         _status.postValue(STARTED)
+    }
+
+    fun findRankingForPercentile(percentile: Float): Long {
+        val totalValues = rankings.size
+        val position = (percentile / 100) * (totalValues - 1)
+        if (position <= 0) return rankings.first()
+        if (position >= totalValues - 1) return rankings.last()
+        val lowerIndex = position.toInt()
+        val upperIndex = lowerIndex + 1
+        val lowerValue = rankings[lowerIndex]
+        val upperValue = rankings[upperIndex]
+        return (lowerValue + (position - lowerIndex) * (upperValue - lowerValue)).toLong()
+    }
+
+    fun findPercentileForRanking(value: Long): Double {
+        val numValuesBelow = rankings.count { it < value }
+        val totalValues = rankings.size
+        return ceil((numValuesBelow.toDouble() / totalValues) * 100)
     }
 
     override fun onCleared() {
