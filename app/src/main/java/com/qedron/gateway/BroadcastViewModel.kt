@@ -42,9 +42,9 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
     private var sendError =false
     private var abortOnError =false
     private var pauseOnError =1000L
+    private var genericErrorCount = 0
+    private var genericErrorLimit = 0
 
-    var genericErrorCount = 0
-    var genericErrorLimit = 0
     var rankings = emptyList<Long>()
     var isMessageModified = false
     var sent = 0
@@ -57,7 +57,6 @@ class BroadcastViewModel(private val application: Application) : AndroidViewMode
             field = value
             hasBroadcastErrors()
         }
-
     var completed = false
         set(value) {
             field = value

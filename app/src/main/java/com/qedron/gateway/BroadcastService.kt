@@ -112,6 +112,7 @@ class BroadcastService() : LifecycleService() {
             .setContentText(text)
             .setContentIntent(pendingIntent)
             .setSound(null)
+//            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
             .addAction(
                 R.drawable.ic_clear_all_24, "abort",
                 clearPendingIntent
