@@ -108,7 +108,7 @@
     <string name="dialog_import_title">Import contacts</string>
     <string name="dialog_import_desc">Add contacts from a fresh CSV file. The expected columns are&lt;br/&gt;
         &lt;br/&gt;
-        - &lt;font color="#FDD835"&gt;&lt;b&gt;phone&lt;/b&gt;&lt;/font&gt;&#160;&#160;&#160;&#160;&#160;is required, no trailing 0s&lt;br/&gt;
+        - &lt;font color="#FDD835"&gt;&lt;b&gt;phone&lt;/b&gt;&lt;/font&gt;&#160;&#160;&#160;&#160;&#160;is required, include country code with no trailing 0s&lt;br/&gt;
         - &lt;font color="#FDD835"&gt;&lt;b&gt;name&lt;/b&gt;&lt;/font&gt;&#160;&#160;&#160;&#160;&#160;&#160;optional&lt;br/&gt;
         - &lt;font color="#FDD835"&gt;&lt;b&gt;details&lt;/b&gt;&lt;/font&gt;&#160;&#160;&#160;optional&lt;br/&gt;
         - &lt;font color="#FDD835"&gt;&lt;b&gt;tag&lt;/b&gt;&lt;/font&gt;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;optional&lt;br/&gt;

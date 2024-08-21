@@ -1,6 +1,7 @@
 package com.qedron.gateway
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.READ_PHONE_STATE
 import android.Manifest.permission.SEND_SMS
 import android.app.Activity
 import android.app.AlertDialog
@@ -85,6 +86,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private val permPhoneStateReqLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val granted = permissions.entries.all {
+                it.value
+            }
+            if (granted) {
+                initFirebase()
+            } else {
+                Toast.makeText(
+                    applicationContext,
+                    "Read phone state permission grant failed. Grant from app settings.", Toast.LENGTH_LONG
+                ).show()
+                finish()
+            }
+        }
+
     private val permSmsReqLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val granted = permissions.entries.all {
@@ -165,6 +182,58 @@ class MainActivity : ComponentActivity() {
 
     }
 
+    private fun checkSMSPermission():Boolean {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                SEND_SMS
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            return if (!ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    SEND_SMS
+                )
+            ) {
+                permSmsReqLauncher.launch(
+                    arrayOf(SEND_SMS),
+                )
+                false
+            } else {
+                Toast.makeText(this, "sms permission is required. Grant permission from app settings", Toast.LENGTH_LONG).show()
+                false
+            }
+        } else {
+            return true
+        }
+
+    }
+
+    private fun checkPhoneStatePermission():Boolean {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                READ_PHONE_STATE
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            return if (!ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    READ_PHONE_STATE
+                )
+            ) {
+                permPhoneStateReqLauncher.launch(
+                    arrayOf(READ_PHONE_STATE),
+                )
+                false
+            } else {
+                Toast.makeText(this, "sms permission is required. Grant permission from app settings", Toast.LENGTH_LONG).show()
+                false
+            }
+        } else {
+            return true
+        }
+
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -193,8 +262,8 @@ class MainActivity : ComponentActivity() {
 
         binding.broadcastBtn.setOnClickListener {  openBroadcastSheet() }
 
-        if(checkSMSPermission()) {
-            initFirebase()
+        if(checkSMSPermission() && checkPhoneStatePermission()) {
+                initFirebase()
         }
         if(checkReadFilePermission()) checkFresh()
 
@@ -209,32 +278,6 @@ class MainActivity : ComponentActivity() {
                 BroadcastViewModel.COMPLETED -> stopBroadcastService()
             }
         }
-    }
-
-    private fun checkSMSPermission():Boolean {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                SEND_SMS
-            )
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            return if (!ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    SEND_SMS
-                )
-            ) {
-                permSmsReqLauncher.launch(
-                    arrayOf(SEND_SMS),
-                )
-                false
-            } else {
-                Toast.makeText(this, "sms permission is required. Grant permission from app settings", Toast.LENGTH_LONG).show()
-                false
-            }
-        } else {
-            return true
-        }
-
     }
 
     private fun initFirebase(){
