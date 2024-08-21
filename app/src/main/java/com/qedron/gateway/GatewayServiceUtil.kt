@@ -1,6 +1,5 @@
 package com.qedron.gateway
 
-import android.Manifest
 import android.app.ActivityManager
 import android.app.Application
 import android.app.Notification
@@ -9,16 +8,12 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.telephony.SmsManager
-import android.telephony.SubscriptionInfo
-import android.telephony.SubscriptionManager
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
